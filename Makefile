@@ -32,7 +32,7 @@ NVC_LINK  = -L/usr/local/cuda/lib64/ -lcudart -lcuda
 
 CUDA_CPP  = nvcc -g -I/usr/local/cuda/include -DUNIX -O2 -Xptxas -v \
             --use_fast_math $(GPU_FLAG) $(SL32)
-CUDA_ARCH = -arch=sm_11
+CUDA_ARCH = -arch=sm_13
 CUDA_LINK = -L/usr/local/cuda/lib64 -lcudart $(CUDA_LIB)
 
 AR = ar
@@ -86,7 +86,7 @@ $(OBJ_DIR)/ucl_test_kernel_d.ptx: ucl_test_kernel.cu
 $(BIN_DIR)/ucl_test: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
 	$(NVC) -o $@ ucl_test.cpp $(OCL_CPP) $(OCL_LINK) $(NVC_LINK)
 
-$(BIN_DIR)/ucl_test_debug: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(BIN_DIR)/ucl_test_kernel.cubin
+$(BIN_DIR)/ucl_test_debug: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
 	$(NVC) -o $@ -DUCL_DEBUG -DUCL_NO_EXIT -g ucl_test.cpp $(OCL_CPP) $(OCL_LINK) $(NVC_LINK)
 
 $(BIN_DIR)/ucl_example_ocl: example.cpp $(NVD_H) $(OCL_H)

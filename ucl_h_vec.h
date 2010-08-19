@@ -296,11 +296,6 @@ class UCL_H_Vec : public UCL_BaseMat {
                           const size_t cols, UCL_Device &dev)
     { view(input+offset,1,cols,dev); }
   
-  #ifdef UCL_DEBUG
-  // Returns the type of host allocation
-  inline enum UCL_MEMOPT kind() const { return _kind; }
-  #endif 
-  
   /// Free memory and set size to 0
   inline void clear() 
     { if (_kind!=UCL_VIEW) {_kind=UCL_VIEW; _cols=0; _host_free(*this,_kind);}}

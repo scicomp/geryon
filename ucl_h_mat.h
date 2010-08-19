@@ -48,11 +48,6 @@ class UCL_H_Mat : public UCL_BaseMat {
             const enum UCL_MEMOPT kind=UCL_RW_OPTIMIZED) 
     { _rows=0; _kind=UCL_VIEW; alloc(rows,cols,device,kind); }
   
-  #ifdef UCL_DEBUG
-  // Returns the type of host allocation
-  inline enum UCL_MEMOPT kind() const { return _kind; }
-  #endif 
-  
   /// Set up host matrix with specied # of rows/cols and reserve memory
   /** The kind parameter controls memory pinning as follows:
     * - UCL_NOT_PINNED      - Memory is not pinned
