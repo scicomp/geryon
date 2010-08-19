@@ -39,10 +39,9 @@ class UCL_Texture {
   inline void get_texture(UCL_Program &prog, const char *texture_name) { }
 
   template<class mat_typ>
-  inline void bind(mat_typ &vec) { }
-  
-  template<class mat_typ>
   inline void bind_float(mat_typ &vec, const unsigned numel) { }
+
+  inline void unbind() { }
 
   /// Make a texture reference available to kernel  
   inline void allow(UCL_Kernel &kernel) { }

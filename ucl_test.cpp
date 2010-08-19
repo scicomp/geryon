@@ -32,6 +32,9 @@
 #include "ocl_timer.h"
 #include "nvd_kernel.h"
 #include "ocl_kernel.h"
+#include "nvc_texture.h"
+#include "nvd_texture.h"
+#include "ocl_texture.h"
 #include <cassert>
 #include <sstream>
 

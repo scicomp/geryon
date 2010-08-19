@@ -24,7 +24,6 @@
 #ifndef NVC_TEXTURE
 #define NVC_TEXTURE
 
-#include "nvc_kernel.h"
 #include "nvc_mat.h"
 
 namespace ucl_cudart {
@@ -34,21 +33,31 @@ class UCL_Texture {
  public:
   UCL_Texture() {}
   ~UCL_Texture() {}
-  inline UCL_Texture(UCL_Program &prog, const char *texture_name) { }
+  inline UCL_Texture(textureReference *t) { get_texture(t); }
   
-  inline void get_texture(UCL_Program &prog, const char *texture_name) { }
+  inline void get_texture(textureReference *t) { _tex_ptr=t; }
 
   template<class mat_typ>
-  inline void bind(mat_typ &vec) { }
-  
-  template<class mat_typ>
-  inline void bind_float(mat_typ &vec, const unsigned numel) { }
+  inline void bind_float(mat_typ &vec, const unsigned numel) {
+    #ifdef UCL_DEBUG
+    assert(numel<5);
+    #endif
+    int bits[4]={0,0,0,0};
+    for (int i=0; i<numel; i++) bits[i]=32;
+    _channel = cudaCreateChannelDesc(bits[0], bits[1], bits[2], bits[3], 
+                                     cudaChannelFormatKindFloat);
+    (*_tex_ptr).addressMode[0] = cudaAddressModeClamp;
+    (*_tex_ptr).addressMode[1] = cudaAddressModeClamp;
+    (*_tex_ptr).filterMode = cudaFilterModePoint;
+    (*_tex_ptr).normalized = false;
+    CUDA_SAFE_CALL(cudaBindTexture(NULL,_tex_ptr,vec.cbegin(),&_channel));
+  }
 
-  /// Make a texture reference available to kernel  
-  inline void allow(UCL_Kernel &kernel) {}
-  
+  inline void unbind() { CUDA_SAFE_CALL(cudaUnbindTexture(_tex_ptr)); }
+
  private:
-  friend class UCL_Kernel;
+  textureReference *_tex_ptr;
+  cudaChannelFormatDesc _channel;
 };
 
 } // namespace

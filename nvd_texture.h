@@ -41,17 +41,13 @@ class UCL_Texture {
     { CU_SAFE_CALL(cuModuleGetTexRef(&_tex, prog._module, texture_name)); }
 
   template<class mat_typ>
-  inline void bind(mat_typ &vec) {
-    CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
-                 vec.numel()*vec.element_size()));
-  }
-  
-  template<class mat_typ>
   inline void bind_float(mat_typ &vec, const unsigned numel) {
     CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
                  vec.numel()*vec.element_size()));
     CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
   }
+
+  inline void unbind() { }
 
   /// Make a texture reference available to kernel  
   inline void allow(UCL_Kernel &kernel) { 
