@@ -1,0 +1,6 @@
+* Add 'kind' specific memory allocation for OpenCL
+
+* Add allocation routines to reserve more memory than elements
+* Add copy constructor routines
+* Add blocking debug error checks that can be turned on to *macros.h
+* Texture stuff
