@@ -102,8 +102,6 @@
 // Only allow this file to be included by nvc_memory.h and ocl_memory.h
 #ifdef UCL_COPY_ALLOW
 
-#include <cassert>
-
 // --------------------------------------------------------------------------
 // - HOST-HOST COPY ROUTINES
 // --------------------------------------------------------------------------

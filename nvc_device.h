@@ -88,14 +88,14 @@ class UCL_Device {
   /// Add a stream for device computations
   inline void push_command_queue() {
     _cq.push_back(cudaStream_t()); 
-    CUDA_SAFE_CALL(cudaStreamCreate(&_cq.back())); 
+    CUDA_SAFE_CALL_NS(cudaStreamCreate(&_cq.back())); 
   }
 
   /// Remove a stream for device computations
   /** \note You cannot delete the default stream **/
   inline void pop_command_queue() {
     if (_cq.size()<2) return;
-    CUDA_SAFE_CALL(cudaStreamDestroy(_cq.back()));
+    CUDA_SAFE_CALL_NS(cudaStreamDestroy(_cq.back()));
     _cq.pop_back();
   }
   
@@ -165,10 +165,10 @@ class UCL_Device {
 
 // Grabs the properties for all devices
 inline UCL_Device::UCL_Device() {
-  CUDA_SAFE_CALL(cudaGetDeviceCount(&_num_devices));
+  CUDA_SAFE_CALL_NS(cudaGetDeviceCount(&_num_devices));
   for (int dev=0; dev<_num_devices; ++dev) {
     cudaDeviceProp deviceProp;
-    CUDA_SAFE_CALL(cudaGetDeviceProperties(&deviceProp, dev));
+    CUDA_SAFE_CALL_NS(cudaGetDeviceProperties(&deviceProp, dev));
     if (deviceProp.major == 9999 && deviceProp.minor == 9999)
       break;
     _properties.push_back(deviceProp);
@@ -188,7 +188,7 @@ inline void UCL_Device::set(int num) {
     return;
   for (int i=1; i<num_queues(); i++) pop_command_queue();
   cudaThreadExit();
-  CUDA_SAFE_CALL(cudaSetDevice(num));
+  CUDA_SAFE_CALL_NS(cudaSetDevice(num));
   _device=num;
 }
 

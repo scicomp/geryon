@@ -104,7 +104,7 @@ class UCL_Device {
   /** \note You cannot delete the default stream **/
   inline void pop_command_queue() {
     if (_cq.size()<2) return;
-    CU_SAFE_CALL(cuStreamDestroy(_cq.back()));
+    CU_SAFE_CALL_NS(cuStreamDestroy(_cq.back()));
     _cq.pop_back();
   }
   
@@ -177,27 +177,27 @@ class UCL_Device {
 
 // Grabs the properties for all devices
 inline UCL_Device::UCL_Device() {
-  CU_SAFE_CALL(cuInit(0));
-  CU_SAFE_CALL(cuDeviceGetCount(&_num_devices));
+  CU_SAFE_CALL_NS(cuInit(0));
+  CU_SAFE_CALL_NS(cuDeviceGetCount(&_num_devices));
   for (int dev=0; dev<_num_devices; ++dev) {
     CUdevice m;
-    CU_SAFE_CALL(cuDeviceGet(&m,dev));
+    CU_SAFE_CALL_NS(cuDeviceGet(&m,dev));
     _properties.push_back(NVDProperties());
     
     char namecstr[1024];
-    CU_SAFE_CALL(cuDeviceGetName(namecstr,1024,m));
+    CU_SAFE_CALL_NS(cuDeviceGetName(namecstr,1024,m));
     _properties.back().name=namecstr;
     
     int minor,major;
-    CU_SAFE_CALL(cuDeviceComputeCapability(&_properties.back().major,
-                                           &_properties.back().minor,m));
+    CU_SAFE_CALL_NS(cuDeviceComputeCapability(&_properties.back().major,
+                                              &_properties.back().minor,m));
     
-    CU_SAFE_CALL(cuDeviceTotalMem(&_properties.back().totalGlobalMem,m));
-    CU_SAFE_CALL(cuDeviceGetAttribute(&_properties.back().multiProcessorCount,
-                                      CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
-                                      m));
+    CU_SAFE_CALL_NS(cuDeviceTotalMem(&_properties.back().totalGlobalMem,m));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(&_properties.back().multiProcessorCount,
+                                         CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
+                                         m));
     
-    CU_SAFE_CALL(cuDeviceGetProperties(&_properties.back().p,m));
+    CU_SAFE_CALL_NS(cuDeviceGetProperties(&_properties.back().p,m));
   }
   _device=-1;
   _cq.push_back(CUstream());
@@ -207,7 +207,7 @@ inline UCL_Device::UCL_Device() {
 inline UCL_Device::~UCL_Device() {
   if (_device>-1) {
     for (int i=1; i<num_queues(); i++) pop_command_queue();
-    CU_SAFE_CALL(cuCtxDestroy(_context));
+    CU_SAFE_CALL_NS(cuCtxDestroy(_context));
   }
 }
 
@@ -216,11 +216,11 @@ inline void UCL_Device::set(int num) {
   if (_device==num)
     return;
   if (_device>-1) {
-    CU_SAFE_CALL(cuCtxDestroy(_context));
+    CU_SAFE_CALL_NS(cuCtxDestroy(_context));
     for (int i=1; i<num_queues(); i++) pop_command_queue();
   }
-  CU_SAFE_CALL(cuDeviceGet(&_cu_device,num));
-  CU_SAFE_CALL(cuCtxCreate(&_context,0,_cu_device));
+  CU_SAFE_CALL_NS(cuDeviceGet(&_cu_device,num));
+  CU_SAFE_CALL_NS(cuCtxCreate(&_context,0,_cu_device));
   _device=num;
 }
 

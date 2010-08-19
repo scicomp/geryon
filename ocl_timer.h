@@ -35,8 +35,12 @@ class UCL_Timer {
   UCL_Timer(UCL_Device &dev) : _total_time(0.0f), initialized(false)
     { init(dev); }
   
-  ~UCL_Timer() 
-    { if (initialized) { CL_SAFE_CALL(clReleaseCommandQueue(_cq)); } }
+  ~UCL_Timer() {
+    if (initialized) 
+      CL_SAFE_CALL(clReleaseCommandQueue(_cq));
+    clReleaseEvent(start_event);
+    clReleaseEvent(stop_event);
+  }
 
   /// Initialize default command queue for timing
   inline void init(UCL_Device &dev) { init(dev,dev.cq()); }
@@ -65,7 +69,8 @@ class UCL_Timer {
   
   /// Add time from previous start and stop to total
   /** Forces synchronization **/
-  inline void add_to_total() { _total_time+=time(); }
+  inline double add_to_total() 
+    { double t=time(); _total_time+=t; return t/1000.0; }
   
   /// Return the time (ms) of last start to stop - Forces synchronization
   inline double time() {

@@ -65,7 +65,8 @@ class UCL_Timer {
   
   /// Add time from previous start and stop to total
   /** Forces synchronization **/
-  inline void add_to_total() { _total_time+=time(); }
+  inline double add_to_total() 
+    { double t=time(); _total_time+=t; return t/1000.0; }
   
   /// Return the time (ms) of last start to stop - Forces synchronization
   inline double time() { 

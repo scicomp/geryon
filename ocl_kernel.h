@@ -39,7 +39,8 @@ class UCL_Program {
     CL_SAFE_CALL(clRetainCommandQueue(_cq));
   }
     
-  ~UCL_Program() { 
+  ~UCL_Program() {
+     CL_SAFE_CALL(clReleaseProgram(_program)); 
      CL_SAFE_CALL(clReleaseContext(_context));
      CL_SAFE_CALL(clReleaseCommandQueue(_cq));
    }
@@ -192,6 +193,7 @@ class UCL_Kernel {
   
  private:
   cl_kernel _kernel;
+  cl_program _program;
   cl_uint _dimensions;
   size_t _block_size[3];
   size_t _num_blocks[3];
@@ -201,12 +203,16 @@ class UCL_Kernel {
 };
 
 inline UCL_Kernel::~UCL_Kernel() {
-  CL_SAFE_CALL(clReleaseCommandQueue(_cq));
+//  clReleaseKernel(_kernel);
+  clReleaseProgram(_program); 
+  clReleaseCommandQueue(_cq);
 }
 
 inline int UCL_Kernel::set_function(UCL_Program &program, const char *function) {
   _cq=program._cq;
   CL_SAFE_CALL(clRetainCommandQueue(_cq));
+  _program=program._program;
+  CL_SAFE_CALL(clRetainProgram(_program));
   cl_int error_flag;
   _kernel=clCreateKernel(program._program,function,&error_flag);
   

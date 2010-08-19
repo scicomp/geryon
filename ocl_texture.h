@@ -1,9 +1,9 @@
 /***************************************************************************
-                                nvd_texture.h
+                                ocl_texture.h
                              -------------------
                                W. Michael Brown
 
-  Utilities for dealing with CUDA Driver textures
+  Utilities for dealing with OpenCL textures
 
  __________________________________________________________________________
     This file is part of the Geryon Unified Coprocessor Library (UCL)
@@ -21,45 +21,33 @@
    the Simplified BSD License.
    ----------------------------------------------------------------------- */
 
-#ifndef NVD_TEXTURE
-#define NVD_TEXTURE
+#ifndef OCL_TEXTURE
+#define OCL_TEXTURE
 
-#include "nvd_kernel.h"
-#include "nvd_mat.h"
+#include "ocl_kernel.h"
+#include "ocl_mat.h"
 
-namespace ucl_cudadr {
+namespace ucl_opencl {
     
 /// Class storing a texture reference
 class UCL_Texture {
  public:
   UCL_Texture() {}
   ~UCL_Texture() {}
-  inline UCL_Texture(UCL_Program &prog, const char *texture_name)
-    { get_texture(prog,texture_name); }
+  inline UCL_Texture(UCL_Program &prog, const char *texture_name) { }
   
-  inline void get_texture(UCL_Program &prog, const char *texture_name)  
-    { CU_SAFE_CALL(cuModuleGetTexRef(&_tex, prog._module, texture_name)); }
+  inline void get_texture(UCL_Program &prog, const char *texture_name) { }
 
   template<class mat_typ>
-  inline void bind(mat_typ &vec) {
-    CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
-                 vec.numel()*vec.element_size()));
-  }
+  inline void bind(mat_typ &vec) { }
   
   template<class mat_typ>
-  inline void bind_float(mat_typ &vec, const unsigned numel) {
-    CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
-                 vec.numel()*vec.element_size()));
-    CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
-  }
+  inline void bind_float(mat_typ &vec, const unsigned numel) { }
 
   /// Make a texture reference available to kernel  
-  inline void allow(UCL_Kernel &kernel) { 
-    CU_SAFE_CALL(cuParamSetTexRef(kernel._kernel, CU_PARAM_TR_DEFAULT, _tex)); 
-  }
+  inline void allow(UCL_Kernel &kernel) { }
   
  private:
-  CUtexref _tex;
   friend class UCL_Kernel;
 };
 

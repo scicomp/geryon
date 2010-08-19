@@ -219,7 +219,7 @@ class UCL_Kernel {
   /// Run the kernel in the default command queue
   inline void run() {
     CU_SAFE_CALL(cuParamSetSize(_kernel,_param_size));
-    CU_SAFE_CALL(cuLaunchGrid(_kernel,_num_blocks[0],_num_blocks[1]));
+    CU_SAFE_CALL(cuLaunchGridAsync(_kernel,_num_blocks[0],_num_blocks[1],0));
   }
   
   /// Run the kernel in the specified command queue

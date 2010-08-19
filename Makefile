@@ -20,8 +20,8 @@ OCL_LINK  = -lOpenCL
 
 # ---------------------------
 #  Uncomment on snow leopard
-SL32      = -m32
-OCL_LINK  = -framework OpenCL
+#SL32      = -m32
+#OCL_LINK  = -framework OpenCL
 # ---------------------------
 
 CPP       = g++ -O2 $(SL32)
@@ -32,7 +32,7 @@ NVC_LINK  = -L/usr/local/cuda/lib64/ -lcudart -lcuda
 
 CUDA_CPP  = nvcc -g -I/usr/local/cuda/include -DUNIX -O2 -Xptxas -v \
             --use_fast_math $(GPU_FLAG) $(SL32)
-CUDA_ARCH = -arch=sm_13
+CUDA_ARCH = -arch=sm_11
 CUDA_LINK = -L/usr/local/cuda/lib64 -lcudart $(CUDA_LIB)
 
 AR = ar

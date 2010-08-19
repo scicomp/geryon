@@ -5,6 +5,13 @@
 #include <cassert>
 #include "CL/cl.h"
 
+#ifdef MPI_GERYON
+#include "mpi.h"
+#define OCL_GERYON_EXIT MPI_Abort(MPI_COMM_WORLD,-1)
+#else
+#define OCL_GERYON_EXIT assert(0==1)
+#endif
+
 #ifndef UCL_NO_API_CHECK
 
 #  define CL_SAFE_CALL( call) do {                                         \
@@ -12,14 +19,14 @@
     if( err != CL_SUCCESS) {                                               \
         fprintf(stderr, "OpenCL error in file '%s' in line %i : %d.\n",    \
                 __FILE__, __LINE__, err );                                 \
-        assert(0==1);                                                           \
+        OCL_GERYON_EXIT;                                                           \
     } } while (0)
 
 #  define CL_CHECK_ERR( val) do {                                        \
     if( val != CL_SUCCESS) {                                               \
         fprintf(stderr, "OpenCL error in file '%s' in line %i : %d.\n",    \
                 __FILE__, __LINE__, val );                                 \
-        assert(0==1);                                                           \
+        OCL_GERYON_EXIT;                                                           \
     } } while (0)
 
 #else  // not DEBUG
