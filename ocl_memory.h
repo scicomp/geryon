@@ -140,7 +140,16 @@ inline int _device_alloc(mat_type &mat, copy_type &cm, const size_t n,
   cl_context context;
   CL_SAFE_CALL(clGetMemObjectInfo(cm.cbegin(),CL_MEM_CONTEXT,sizeof(context),
                &context,NULL));
-  mat.cbegin()=clCreateBuffer(context,CL_MEM_READ_WRITE,n,NULL,&error_flag);
+  cl_mem_flags flag;
+  if (kind==UCL_READ_WRITE)
+    flag=CL_MEM_READ_WRITE;
+  else if (kind==UCL_READ_ONLY)
+    flag=CL_MEM_READ_ONLY;
+  else if (kind==UCL_WRITE_ONLY)
+    flag=CL_MEM_WRITE_ONLY;
+  else
+    assert(0==1);
+  mat.cbegin()=clCreateBuffer(context,flag,n,NULL,&error_flag);
   if (error_flag != CL_SUCCESS) 
     return UCL_MEMORY_ERROR;
   mat.cq()=cm.cq();
@@ -152,7 +161,16 @@ template <class mat_type>
 inline int _device_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
                          const enum UCL_MEMOPT kind) {
   cl_int error_flag;
-  mat.cbegin()=clCreateBuffer(dev.context(),CL_MEM_READ_WRITE,n,NULL,
+  cl_mem_flags flag;
+  if (kind==UCL_READ_WRITE)
+    flag=CL_MEM_READ_WRITE;
+  else if (kind==UCL_READ_ONLY)
+    flag=CL_MEM_READ_ONLY;
+  else if (kind==UCL_WRITE_ONLY)
+    flag=CL_MEM_WRITE_ONLY;
+  else
+    assert(0==1);
+  mat.cbegin()=clCreateBuffer(dev.context(),flag,n,NULL,
                               &error_flag);
   if (error_flag != CL_SUCCESS) 
     return UCL_MEMORY_ERROR;
