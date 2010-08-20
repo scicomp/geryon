@@ -34,13 +34,16 @@ class UCL_Texture {
  public:
   UCL_Texture() {}
   ~UCL_Texture() {}
+  /// Construct with a specified texture reference
   inline UCL_Texture(UCL_Program &prog, const char *texture_name) { }
-  
+  /// Set the texture reference for this object
   inline void get_texture(UCL_Program &prog, const char *texture_name) { }
 
+  /// Bind a float array where each fetch grabs a vector of length numel
   template<class mat_typ>
   inline void bind_float(mat_typ &vec, const unsigned numel) { }
 
+  /// Unbind the texture reference from the memory allocation
   inline void unbind() { }
 
   /// Make a texture reference available to kernel  

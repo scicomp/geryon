@@ -127,7 +127,7 @@ class UCL_Device {
   /// Returns true if double precision is support for the current device
   bool double_precision() { return double_precision(_device); }
   /// Returns true if double precision is support for the device
-  bool double_precision(const int i) {return compute_cap(i)>=1.3;}
+  bool double_precision(const int i) {return arch(i)>=1.3;}
   
   /// Get the number of cores in the current device
   inline unsigned cores() { return cores(_device); }
@@ -147,9 +147,9 @@ class UCL_Device {
   inline size_t bytes(const int i) { return _properties[i].totalGlobalMem; }
 
   /// Return the GPGPU compute capability for current device
-  inline double compute_cap() { return compute_cap(_device); }
+  inline double arch() { return arch(_device); }
   /// Return the GPGPU compute capability
-  inline double compute_cap(const int i) 
+  inline double arch(const int i) 
     { return static_cast<double>(_properties[i].minor)/10+_properties[i].major;}
   
   /// Clock rate in GHz for current device
@@ -233,7 +233,7 @@ inline void UCL_Device::print_all(std::ostream &out) {
     out << "  Type of device:                                "
         << device_type_name(i).c_str() << std::endl;
     out << "  Compute capability:                            "
-        << compute_cap(i) << std::endl;
+        << arch(i) << std::endl;
     out << "  Double precision support:                      ";
     if (double_precision(i))
       out << "Yes\n";
