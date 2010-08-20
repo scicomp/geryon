@@ -194,6 +194,11 @@ class UCL_Device {
   inline size_t group_size(const int i) 
     { return _properties[i].work_group_size; }
   
+  /// Return the maximum memory pitch in bytes for current device
+  inline size_t max_pitch() { return max_pitch(_device); }
+  /// Return the maximum memory pitch in bytes
+  inline size_t max_pitch(const int i) { return 0; }
+
   /// List all devices along with all properties
   void print_all(std::ostream &out);
   

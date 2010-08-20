@@ -124,7 +124,8 @@ class UCL_Device {
   inline unsigned cores() { return cores(_device); }
   /// Get the number of cores
   inline unsigned cores(const int i) 
-    { return _properties[i].multiProcessorCount*8; }
+    { if (arch(i)<2.0) return _properties[i].multiProcessorCount*8; 
+      else return _properties[i].multiProcessorCount*32; }
   
   /// Get the gigabytes of global memory in the current device
   inline double gigabytes() { return gigabytes(_device); }
@@ -154,6 +155,11 @@ class UCL_Device {
   inline size_t group_size(const int i) 
     { return _properties[i].maxThreadsPerBlock; }
   
+  /// Return the maximum memory pitch in bytes for current device
+  inline size_t max_pitch() { return max_pitch(_device); }
+  /// Return the maximum memory pitch in bytes
+  inline size_t max_pitch(const int i) { return _properties[i].memPitch; }
+
   /// List all devices along with all properties
   void print_all(std::ostream &out);
  
@@ -234,7 +240,7 @@ inline void UCL_Device::print_all(std::ostream &out) {
         << _properties[i].maxGridSize[1] << " x "
         << _properties[i].maxGridSize[2] << std::endl;
     out << "  Maximum memory pitch:                          "
-        << _properties[i].memPitch << " bytes\n";
+        << max_pitch(i) << " bytes\n";
     out << "  Texture alignment:                             "
         << _properties[i].textureAlignment << " bytes\n";
     out << "  Clock rate:                                    "

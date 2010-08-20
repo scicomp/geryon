@@ -775,7 +775,11 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src,
   * - Currently does not handle textures **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, command_queue &cq) {
-  if (mat2::PADDED==1 || (mat1::PADDED==1 && mat2::VECTOR==0) )
+  if (dst.row_bytes()==src.row_bytes() &&
+      src.kind()!=UCL_VIEW && dst.kind()!=UCL_VIEW &&
+      (int)mat1::DATA_TYPE==(int)mat2::DATA_TYPE)
+    ucl_copy(dst,src,src.row_size()*src.rows(),cq);
+  else if (mat2::PADDED==1 || (mat1::PADDED==1 && mat2::VECTOR==0) )
     ucl_copy(dst,src,src.rows(),src.cols(),cq);
   else if (mat1::PADDED==1)
     ucl_copy(dst,src,dst.rows(),dst.cols(),cq);
@@ -800,6 +804,10 @@ template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const bool async) {
   if (async)
     ucl_copy(dst,src,dst.cq());
+  else if (dst.row_bytes()==src.row_bytes() && 
+           src.kind()!=UCL_VIEW && dst.kind()!=UCL_VIEW &&
+           (int)mat1::DATA_TYPE==(int)mat2::DATA_TYPE)
+    ucl_copy(dst,src,src.row_size()*src.rows(),async);
   else if (mat2::PADDED==1 || (mat1::PADDED==1 && mat2::VECTOR==0) )
     ucl_copy(dst,src,src.rows(),src.cols(),async);
   else if (mat1::PADDED==1)

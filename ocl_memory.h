@@ -184,8 +184,8 @@ inline int _device_alloc(mat_type &mat, copy_type &cm, const size_t rows,
                          const size_t cols, size_t &pitch,
                          const enum UCL_MEMOPT kind) {
   size_t padded_cols=cols;
-  if (cols%16!=0)
-    padded_cols+=16-cols%16;
+  if (cols%256!=0)
+    padded_cols+=256-cols%256;
   pitch=padded_cols*sizeof(typename mat_type::data_type);
   return _device_alloc(mat,cm,pitch*rows,kind);
 }
@@ -195,8 +195,8 @@ inline int _device_alloc(mat_type &mat, UCL_Device &dev, const size_t rows,
                          const size_t cols, size_t &pitch,
                          const enum UCL_MEMOPT kind) {
   size_t padded_cols=cols;
-  if (dev.device_type()!=UCL_CPU && cols%16!=0)
-    padded_cols+=16-cols%16;
+  if (dev.device_type()!=UCL_CPU && cols%256!=0)
+    padded_cols+=256-cols%256;
   pitch=padded_cols*sizeof(typename mat_type::data_type);
   return _device_alloc(mat,dev,pitch*rows,kind);  
 }
