@@ -41,8 +41,8 @@ class UCL_Timer {
   /** \note init() must be called to reuse timer after a clear() **/
   inline void clear() {
     if (_initialized) { 
-      cuEventDestroy(start_event);
-      cuEventDestroy(stop_event);
+      CU_SAFE_CALL(cuEventDestroy(start_event));
+      CU_SAFE_CALL(cuEventDestroy(stop_event));
       _initialized=false;
     }
   }
@@ -60,14 +60,16 @@ class UCL_Timer {
   }
 
   /// Start timing on command queue
-  inline void start() { cuEventRecord(start_event,_cq); }
+  inline void start() { CU_SAFE_CALL(cuEventRecord(start_event,_cq)); }
   
   /// Stop timing on command queue
-  inline void stop() { cuEventRecord(stop_event,_cq); }
+  inline void stop() { CU_SAFE_CALL(cuEventRecord(stop_event,_cq)); }
   
   /// Set the time elapsed to zero (not the total_time)
-  inline void zero() 
-    { cuEventRecord(start_event,_cq); cuEventRecord(stop_event,_cq); } 
+  inline void zero() {
+    CU_SAFE_CALL(cuEventRecord(start_event,_cq));
+    CU_SAFE_CALL(cuEventRecord(stop_event,_cq));
+  }
   
   /// Add time from previous start and stop to total
   /** Forces synchronization **/
@@ -77,7 +79,7 @@ class UCL_Timer {
   /// Return the time (ms) of last start to stop - Forces synchronization
   inline double time() { 
     float timer;
-    cuEventSynchronize(stop_event);
+    CU_SAFE_CALL(cuEventSynchronize(stop_event));
     CU_SAFE_CALL( cuEventElapsedTime(&timer,start_event,stop_event) );
     return timer; 
   }

@@ -41,8 +41,8 @@ class UCL_Timer {
   /** \note init() must be called to reuse timer after a clear() **/
   inline void clear() {
     if (_initialized) { 
-      cudaEventDestroy(start_event);
-      cudaEventDestroy(stop_event);
+      CUDA_SAFE_CALL(cudaEventDestroy(start_event));
+      CUDA_SAFE_CALL(cudaEventDestroy(stop_event));
       _initialized=false;
     }
   }
@@ -60,14 +60,16 @@ class UCL_Timer {
   }
   
   /// Start timing on command queue
-  inline void start() { cudaEventRecord(start_event,_cq); }
+  inline void start() { CUDA_SAFE_CALL(cudaEventRecord(start_event,_cq)); }
   
   /// Stop timing on command queue
-  inline void stop() { cudaEventRecord(stop_event,_cq); }
+  inline void stop() { CUDA_SAFE_CALL(cudaEventRecord(stop_event,_cq)); }
   
   /// Set the time elapsed to zero (not the total_time)
-  inline void zero() 
-    { cudaEventRecord(start_event,_cq); cudaEventRecord(stop_event,_cq); } 
+  inline void zero() {
+    CUDA_SAFE_CALL(cudaEventRecord(start_event,_cq));
+    CUDA_SAFE_CALL(cudaEventRecord(stop_event,_cq));
+  } 
   
   /// Add time from previous start and stop to total
   /** Forces synchronization **/
@@ -77,7 +79,7 @@ class UCL_Timer {
   /// Return the time (ms) of last start to stop - Forces synchronization
   inline double time() { 
     float timer;
-    cudaEventSynchronize(stop_event);
+    CUDA_SAFE_CALL(cudaEventSynchronize(stop_event));
     CUDA_SAFE_CALL( cudaEventElapsedTime(&timer,start_event,stop_event) );
     return timer; 
   }
