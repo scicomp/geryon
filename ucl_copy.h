@@ -488,7 +488,7 @@ template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
                      command_queue &cq) {
   #ifdef UCL_DEBUG
-  assert(dst.numel()>=numel && src.numel()>=numel);
+  assert(dst.row_size()*dst.rows()>=numel && src.row_size()*src.rows()>=numel);
   assert(mat1::ROW_MAJOR==1 && mat2::ROW_MAJOR==1);
   assert(mat1::ROW_MAJOR==1 && mat2::ROW_MAJOR==1);
   #endif
@@ -525,7 +525,7 @@ template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
                      const bool async) {
   #ifdef UCL_DEBUG
-  assert(dst.numel()>=numel && src.numel()>=numel);
+  assert(dst.row_size()*dst.rows()>=numel && src.row_size()*src.rows()>=numel);
   assert(mat1::ROW_MAJOR==1 && mat2::ROW_MAJOR==1);
   #endif
   if (mat1::MEM_TYPE==1 && mat2::MEM_TYPE==1)

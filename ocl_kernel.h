@@ -32,19 +32,32 @@ namespace ucl_opencl {
 /// Class storing 1 or more kernel functions from a single string or file
 class UCL_Program {
  public:
-  UCL_Program(UCL_Device &device) : _device(device.cl_device()),
-                                     _context(device.context()), 
-                                     _cq(device.cq()) {
+  inline UCL_Program() : _init_done(false) {}
+  inline UCL_Program(UCL_Device &device) : _init_done(false) { init(device); }
+  inline ~UCL_Program() { clear(); }
+
+  /// Initialize the program with a device
+  inline void init(UCL_Device &device) {
+    clear();
+    _device=device.cl_device();
+    _context=device.context();
+    _cq=device.cq();
     CL_SAFE_CALL(clRetainContext(_context)); 
     CL_SAFE_CALL(clRetainCommandQueue(_cq));
+    _init_done=true;
   }
-    
-  ~UCL_Program() {
-     CL_SAFE_CALL(clReleaseProgram(_program)); 
-     CL_SAFE_CALL(clReleaseContext(_context));
-     CL_SAFE_CALL(clReleaseCommandQueue(_cq));
-   }
-  
+
+  /// Clear any data associated with program
+  /** \note Must call init() after each clear **/
+  inline void clear() {
+    if (_init_done) {
+      CL_SAFE_CALL(clReleaseProgram(_program)); 
+      CL_SAFE_CALL(clReleaseContext(_context));
+      CL_SAFE_CALL(clReleaseCommandQueue(_cq));
+      _init_done=false;
+    }
+  }
+
   /// Load a program from a file and compile with flags
   inline int load(const char *filename, const char *flags="",
                   std::string *log=NULL) {
@@ -106,6 +119,7 @@ class UCL_Program {
    
   friend class UCL_Kernel;
  private:
+  bool _init_done;
   cl_program _program;
   cl_device_id _device; 
   cl_context _context;
@@ -115,14 +129,24 @@ class UCL_Program {
 /// Class for dealing with OpenCL kernels
 class UCL_Kernel {
  public:
-  UCL_Kernel() : _dimensions(1), _num_args(0) 
+  UCL_Kernel() : _dimensions(1), _num_args(0), _function_set(false)
     {  _block_size[0]=0; _num_blocks[0]=0; }
   
-  UCL_Kernel(UCL_Program &program, const char *function) : 
-    _dimensions(1), _num_args(0)
+  inline UCL_Kernel(UCL_Program &program, const char *function) :
+    _dimensions(1), _num_args(0), _function_set(false)
     {  _block_size[0]=0; _num_blocks[0]=0; set_function(program,function); }
 
-  ~UCL_Kernel();
+  inline ~UCL_Kernel() { clear(); }
+
+  /// Clear any function associated with the kernel
+  inline void clear() {
+    if (_function_set) {
+      clReleaseKernel(_kernel);
+      clReleaseProgram(_program);
+      clReleaseCommandQueue(_cq);
+      _function_set=false;
+    }
+  }
 
   /// Get the kernel function from a program
   /** \return UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/
@@ -197,18 +221,15 @@ class UCL_Kernel {
   cl_uint _dimensions;
   size_t _block_size[3];
   size_t _num_blocks[3];
+  bool _function_set;
   
   cl_command_queue _cq;        // The default command queue for this kernel
   unsigned _num_args;
 };
 
-inline UCL_Kernel::~UCL_Kernel() {
-//  clReleaseKernel(_kernel);
-  clReleaseProgram(_program); 
-  clReleaseCommandQueue(_cq);
-}
-
 inline int UCL_Kernel::set_function(UCL_Program &program, const char *function) {
+  clear();
+  _function_set=true;
   _cq=program._cq;
   CL_SAFE_CALL(clRetainCommandQueue(_cq));
   _program=program._program;

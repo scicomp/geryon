@@ -34,9 +34,16 @@ class UCL_Texture;
 /// Class storing 1 or more kernel functions from a single string or file
 class UCL_Program {
  public:
-  UCL_Program(UCL_Device &device) {}
-  ~UCL_Program() {}
-  
+  inline UCL_Program(UCL_Device &device) {}
+  inline ~UCL_Program() {}
+
+  /// Initialize the program with a device
+  inline void init(UCL_Device &device) { }
+
+  /// Clear any data associated with program
+  /** \note Must call init() after each clear **/
+  inline void clear() { }
+
   /// Load a program from a file and compile with flags
   inline int load(const char *filename, const char *flags="",
                   std::string *log=NULL) {
@@ -137,6 +144,9 @@ class UCL_Kernel {
     { _num_blocks[0]=0; set_function(program,function); }
   
   ~UCL_Kernel() {}
+
+  /// Clear any function associated with the kernel
+  inline void clear() { }
 
   /// Get the kernel function from a program
   /** \ret UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/

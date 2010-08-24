@@ -31,30 +31,35 @@ namespace ucl_opencl {
 /// Class for timing OpenCL events
 class UCL_Timer {
  public:
-  UCL_Timer() : _total_time(0.0f), initialized(false) { }
-  UCL_Timer(UCL_Device &dev) : _total_time(0.0f), initialized(false)
+  inline UCL_Timer() : _total_time(0.0f), _initialized(false) { }
+  inline UCL_Timer(UCL_Device &dev) : _total_time(0.0f), _initialized(false)
     { init(dev); }
-  
-  ~UCL_Timer() {
-    if (initialized) 
+
+  inline ~UCL_Timer() { clear(); }
+
+  /// Clear any data associated with timer
+  /** \note init() must be called to reuse timer after a clear() **/
+  inline void clear() {
+    if (_initialized) {
       CL_SAFE_CALL(clReleaseCommandQueue(_cq));
-    clReleaseEvent(start_event);
-    clReleaseEvent(stop_event);
+      clReleaseEvent(start_event);
+      clReleaseEvent(stop_event);
+      _initialized=false;
+    }
   }
 
   /// Initialize default command queue for timing
   inline void init(UCL_Device &dev) { init(dev,dev.cq()); }
-  
+
   /// Initialize command queue for timing
   inline void init(UCL_Device &dev, command_queue &cq) {
-    t_factor=dev.timer_resolution()/1000000000.0;   
-    if (initialized)
-      CL_SAFE_CALL(clReleaseCommandQueue(_cq));
+    clear();
+    t_factor=dev.timer_resolution()/1000000000.0;
     _cq=cq;
     clRetainCommandQueue(_cq);
     CL_SAFE_CALL(clSetCommandQueueProperty(_cq,CL_QUEUE_PROFILING_ENABLE,
                                            CL_TRUE,NULL));
-    initialized=true;
+    _initialized=true;
   }
   
   /// Start timing on default command queue
@@ -98,7 +103,7 @@ class UCL_Timer {
   cl_event start_event, stop_event;
   cl_command_queue _cq;
   double _total_time;
-  bool initialized;
+  bool _initialized;
   double t_factor;
 };
 

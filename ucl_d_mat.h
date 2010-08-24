@@ -133,6 +133,7 @@ class UCL_D_Mat : public UCL_BaseMat {
     _rows=rows;
     _cols=cols;
     _pitch=stride*sizeof(numtyp);
+    _row_size=stride;
     this->_cq=input.cq();
     #ifdef _OCL_MAT
     _offset=0;
@@ -190,6 +191,7 @@ class UCL_D_Mat : public UCL_BaseMat {
     _cols=cols;
     _rows=rows;
     _pitch=stride*sizeof(numtyp);
+    _row_size=stride;
     this->_cq=dev.cq();
     _array=input;
     #ifndef _UCL_DEVICE_PTR_MAT
@@ -230,6 +232,7 @@ class UCL_D_Mat : public UCL_BaseMat {
     _cols=cols;
     _rows=rows;
     _pitch=stride*sizeof(numtyp);
+    _row_size=stride;
     this->_cq=input.cq();
     #ifdef _OCL_MAT
     _array=input.begin();
@@ -294,6 +297,7 @@ class UCL_D_Mat : public UCL_BaseMat {
     _cols=cols;
     _rows=rows;
     _pitch=stride*sizeof(numtyp);
+    _row_size=stride;
     this->_cq=dev.cq();
     
     #ifdef _OCL_MAT

@@ -31,26 +31,32 @@ namespace ucl_cudart {
 /// Class for timing CUDA events
 class UCL_Timer {
  public:
-  UCL_Timer() : _total_time(0.0f), initialized(false) { }
-  UCL_Timer(UCL_Device &dev) : _total_time(0.0f), initialized(false)
+  inline UCL_Timer() : _total_time(0.0f), _initialized(false) { }
+  inline UCL_Timer(UCL_Device &dev) : _total_time(0.0f), _initialized(false)
     { init(dev); }
-  
-  ~UCL_Timer() {
-    if (initialized) 
-      { cudaEventDestroy(start_event); cudaEventDestroy(stop_event); }
+
+  inline ~UCL_Timer() { clear(); }
+
+  /// Clear any data associated with timer
+  /** \note init() must be called to reuse timer after a clear() **/
+  inline void clear() {
+    if (_initialized) { 
+      cudaEventDestroy(start_event);
+      cudaEventDestroy(stop_event);
+      _initialized=false;
+    }
   }
 
   /// Initialize default command queue for timing
   inline void init(UCL_Device &dev) { init(dev, dev.cq()); }
-  
+
   /// Initialize command queue for timing
   inline void init(UCL_Device &dev, command_queue &cq) {
+    clear();
     _cq=cq;
-    if (!initialized) {
-      initialized=true;
-      CUDA_SAFE_CALL( cudaEventCreate(&start_event) );
-      CUDA_SAFE_CALL( cudaEventCreate(&stop_event) );
-    }
+    _initialized=true;
+    CUDA_SAFE_CALL( cudaEventCreate(&start_event) );
+    CUDA_SAFE_CALL( cudaEventCreate(&stop_event) );
   }
   
   /// Start timing on command queue
@@ -89,7 +95,7 @@ class UCL_Timer {
   cudaEvent_t start_event, stop_event;
   cudaStream_t _cq;
   double _total_time;
-  bool initialized;
+  bool _initialized;
 };
 
 } // namespace
