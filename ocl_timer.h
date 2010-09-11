@@ -45,6 +45,7 @@ class UCL_Timer {
       clReleaseEvent(start_event);
       clReleaseEvent(stop_event);
       _initialized=false;
+      _total_time=0.0;
     }
   }
 

@@ -10,7 +10,7 @@ CUDA Driver, and OpenCL APIs with a consistent interface:
 
     * Change from one API to another by simply changing the namespace
     * Use multiple APIs in the same code
-    * Lightweight (only include files – no build required)
+    * Lightweight (only include files - no build required)
     * Manage device query and selection
     * Simple vector and matrix containers
     * Simple routines for data copy and type casting
@@ -24,8 +24,4 @@ your code.
 
 Documentation and examples are provided at 
 
-http://www.cs.sandia.gov/~wmbrown/geryon/index.htm
-
-
-
-
+http://users.nccs.gov/~wb8/geryon/index.htm

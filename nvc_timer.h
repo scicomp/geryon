@@ -44,6 +44,7 @@ class UCL_Timer {
       CUDA_SAFE_CALL(cudaEventDestroy(start_event));
       CUDA_SAFE_CALL(cudaEventDestroy(stop_event));
       _initialized=false;
+      _total_time=0.0;
     }
   }
 

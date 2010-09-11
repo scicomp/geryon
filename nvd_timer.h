@@ -44,6 +44,7 @@ class UCL_Timer {
       CU_SAFE_CALL(cuEventDestroy(start_event));
       CU_SAFE_CALL(cuEventDestroy(stop_event));
       _initialized=false;
+      _total_time=0.0;
     }
   }
 

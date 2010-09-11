@@ -2,7 +2,7 @@
 
 cd /tmp
 rm -rf geryon
-cp -R /homes/wmbrown/svn/geryon .
+cp -R /homes/wb8/code/svn/geryon .
 cd geryon
 rm replace_code.sh
 rm make_dist.sh
@@ -20,5 +20,5 @@ cd ../
 tar -cvf geryon.$version.tar geryon
 gzip geryon.$version.tar
 
-cd /homes/wmbrown/svn/geryon
-echo "File geryon.$version.tar located in /tmp"
+cd /homes/wb8/code/svn/geryon
+echo "File geryon.$version.tar.gz located in /tmp"

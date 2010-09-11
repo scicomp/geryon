@@ -33,7 +33,7 @@
   * The Geryon source code, examples, and slides describing Geryon and
   * CUDA and OpenCL APIs can be found here:
   *
-  * http://www.cs.sandia.gov/~wmbrown/geryon/index.htm
+  * http://users.nccs.gov/~wb8/geryon/index.htm
   *
   * Geryon is divided into 3 namespaces:
   *   - ucl_cudart - Namespace for CUDA-Runtime
