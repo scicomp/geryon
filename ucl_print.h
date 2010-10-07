@@ -29,7 +29,7 @@ template <> struct _ucl_print<1> {
   template <class mat_type>
   static inline void p(mat_type &mat, const size_t n, std::ostream &out,
                        const std::string delim) {
-    for (int i=0; i<n-1; i++)
+    for (size_t i=0; i<n-1; i++)
       out << mat[i] << delim;
     out << mat[n-1];
   }
@@ -46,9 +46,9 @@ template <> struct _ucl_print<1> {
     int row_size=cols;
     if (mat_type::VECTOR==0)
       row_size=mat.row_size();
-    for (int j=0; j<rows; j++) {
-      int lend=offset+cols-1;
-      for (int i=offset; i<lend; i++)
+    for (size_t j=0; j<rows; j++) {
+      size_t lend=offset+cols-1;
+      for (size_t i=offset; i<lend; i++)
         out << mat[i] << delim;
       out << mat[lend];
       if (j!=rows-1)

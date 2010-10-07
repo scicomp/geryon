@@ -58,8 +58,6 @@ class UCL_Timer {
     t_factor=dev.timer_resolution()/1000000000.0;
     _cq=cq;
     clRetainCommandQueue(_cq);
-    CL_SAFE_CALL(clSetCommandQueueProperty(_cq,CL_QUEUE_PROFILING_ENABLE,
-                                           CL_TRUE,NULL));
     _initialized=true;
   }
   

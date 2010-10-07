@@ -172,7 +172,6 @@
   // - ALLOCATE SOME MATRICES FOR VIEW TESTS
   // -------------------------------------------------------------------------
   numtyp h_view_cpp1[9]={ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-  numtyp h_view_cpp2[9];
   UCL_H_Vec<numtyp> h_view_ucl1(9,cop), h_view_ucl2(9,cop);
   for (int i=0; i<9; i++) h_view_ucl1[i]=static_cast<numtyp>(i+1);
   UCL_H_Mat<numtyp> h_view_ucl3(3,3,cop), h_view_ucl4(3,3,cop);

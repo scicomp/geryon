@@ -129,11 +129,11 @@ class UCL_Program {
 /// Class for dealing with OpenCL kernels
 class UCL_Kernel {
  public:
-  UCL_Kernel() : _dimensions(1), _num_args(0), _function_set(false)
+  UCL_Kernel() : _dimensions(1), _function_set(false), _num_args(0)
     {  _block_size[0]=0; _num_blocks[0]=0; }
   
   inline UCL_Kernel(UCL_Program &program, const char *function) :
-    _dimensions(1), _num_args(0), _function_set(false)
+    _dimensions(1), _function_set(false), _num_args(0)
     {  _block_size[0]=0; _num_blocks[0]=0; set_function(program,function); }
 
   inline ~UCL_Kernel() { clear(); }

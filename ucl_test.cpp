@@ -105,19 +105,19 @@ const char * nvd_string_10_64 = \
 
 template <class mat_type>
 void fill_test(mat_type &mat, const size_t n) {
-  for (int i=0; i<n; i++)
+  for (size_t i=0; i<n; i++)
     mat[i]=static_cast<typename mat_type::data_type>(i);
-  for (int i=0; i<n; i++)
+  for (size_t i=0; i<n; i++)
     assert(mat[i]==static_cast<typename mat_type::data_type>(i));
 }
 
 template <class mat_type>
 void fill_test(mat_type &mat, const size_t rows, const size_t cols) {
-  for (int i=0; i<cols; i++)
-    for (int j=0; j<rows; j++)
+  for (size_t i=0; i<cols; i++)
+    for (size_t j=0; j<rows; j++)
       mat(j,i)=static_cast<typename mat_type::data_type>(i*rows+j);
-  for (int i=0; i<cols; i++)
-    for (int j=0; j<rows; j++)
+  for (size_t i=0; i<cols; i++)
+    for (size_t j=0; j<rows; j++)
       assert(mat(j,i)==static_cast<typename mat_type::data_type>(i*rows+j));
 }
 

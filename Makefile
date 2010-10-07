@@ -20,13 +20,13 @@ OCL_LINK  = -lOpenCL
 
 # ---------------------------
 #  Uncomment on snow leopard
-#SL32      = -m32
+#SL32      = -m32 -I./opencl_1_0
 #OCL_LINK  = -framework OpenCL
 # ---------------------------
 
-CPP       = g++ -O2 $(SL32)
-NVC_CPP   = $(SL32) -O2 -I/usr/local/cuda/include
-OCL_CPP   = $(SL32) -O2 -I./opencl
+CPP       = g++ -O2 $(SL32) -Wall
+NVC_CPP   = -O2 -I/usr/local/cuda/include
+OCL_CPP   = -O2 -I./opencl
 LINK      = g++ -O2 $(SL32)
 NVC_LINK  = -L/usr/local/cuda/lib64/ -lcudart -lcuda
 
@@ -84,10 +84,10 @@ $(OBJ_DIR)/ucl_test_kernel_d.ptx: ucl_test_kernel.cu
 	$(CUDA) -DNV_KERNEL -DOrdinal=int -DScalar=double -ptx -o $@ ucl_test_kernel.cu 
 
 $(BIN_DIR)/ucl_test: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
-	$(NVC) -o $@ ucl_test.cpp $(OCL_CPP) $(OCL_LINK) $(NVC_LINK)
+	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ ucl_test.cpp $(OCL_LINK) $(NVC_LINK)
 
 $(BIN_DIR)/ucl_test_debug: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
-	$(NVC) -o $@ -DUCL_DEBUG -DUCL_NO_EXIT -g ucl_test.cpp $(OCL_CPP) $(OCL_LINK) $(NVC_LINK)
+	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ -DUCL_DEBUG -DUCL_NO_EXIT -g ucl_test.cpp $(OCL_LINK) $(NVC_LINK)
 
 $(BIN_DIR)/ucl_example_ocl: example.cpp $(NVD_H) $(OCL_H)
 	$(OCL) -o $@ example.cpp -DUSE_OPENCL $(OCL_LINK) 

@@ -45,11 +45,13 @@ inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,
                         const enum UCL_MEMOPT kind) {
   cudaError err;
   if (kind==UCL_RW_OPTIMIZED)  
-    err=cudaMallocHost(mat.host_ptr(),n);
+    err=cudaMallocHost((void **)mat.host_ptr(),n);
   else if (kind==UCL_WRITE_OPTIMIZED)
-    err=cudaHostAlloc(mat.host_ptr(),n,cudaHostAllocWriteCombined);
-  else
-    *(mat.host_ptr())=malloc(n);
+    err=cudaHostAlloc((void **)mat.host_ptr(),n,cudaHostAllocWriteCombined);
+  else {
+    *(mat.host_ptr())=(typename mat_type::data_type*)malloc(n);
+    err=cudaSuccess;
+  }
   if (err!=cudaSuccess || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
   return UCL_SUCCESS;
@@ -60,11 +62,13 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
                         const enum UCL_MEMOPT kind) {
   cudaError err;
   if (kind==UCL_RW_OPTIMIZED)  
-    err=cudaMallocHost(mat.host_ptr(),n);
+    err=cudaMallocHost((void **)mat.host_ptr(),n);
   else if (kind==UCL_WRITE_OPTIMIZED)
-    err=cudaHostAlloc(mat.host_ptr(),n,cudaHostAllocWriteCombined);
-  else
-    *(mat.host_ptr())=malloc(n);
+    err=cudaHostAlloc((void **)mat.host_ptr(),n,cudaHostAllocWriteCombined);
+  else {
+    *(mat.host_ptr())=(typename mat_type::data_type*)malloc(n);
+    err=cudaSuccess;
+  }
   if (err!=cudaSuccess || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
   return UCL_SUCCESS;

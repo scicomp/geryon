@@ -50,11 +50,11 @@ inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,
                         const enum UCL_MEMOPT kind) {
   CUresult err=CUDA_SUCCESS;
   if (kind==UCL_RW_OPTIMIZED)  
-    err=cuMemAllocHost(mat.host_ptr(),n);
+    err=cuMemAllocHost((void **)mat.host_ptr(),n);
   else if (kind==UCL_WRITE_OPTIMIZED)
-    err=cuMemHostAlloc(mat.host_ptr(),n,CU_MEMHOSTALLOC_WRITECOMBINED);
+    err=cuMemHostAlloc((void **)mat.host_ptr(),n,CU_MEMHOSTALLOC_WRITECOMBINED);
   else
-    *(mat.host_ptr())=malloc(n);
+    *(mat.host_ptr())=(typename mat_type::data_type*)malloc(n);
   if (err!=CUDA_SUCCESS || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
   return UCL_SUCCESS;
@@ -65,11 +65,11 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
                        const enum UCL_MEMOPT kind) {
   CUresult err=CUDA_SUCCESS;
   if (kind==UCL_RW_OPTIMIZED)  
-    err=cuMemAllocHost(mat.host_ptr(),n);
+    err=cuMemAllocHost((void **)mat.host_ptr(),n);
   else if (kind==UCL_WRITE_OPTIMIZED)
-    err=cuMemHostAlloc(mat.host_ptr(),n,CU_MEMHOSTALLOC_WRITECOMBINED);
+    err=cuMemHostAlloc((void **)mat.host_ptr(),n,CU_MEMHOSTALLOC_WRITECOMBINED);
   else
-    *(mat.host_ptr())=malloc(n);
+    *(mat.host_ptr())=(typename mat_type::data_type*)malloc(n);
   if (err!=CUDA_SUCCESS || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
   return UCL_SUCCESS;
@@ -109,7 +109,7 @@ inline int _device_alloc(mat_type &mat, copy_type &cm, const size_t rows,
                          const size_t cols, size_t &pitch,
                          const enum UCL_MEMOPT kind) {
   CUresult err;
-  unsigned upitch;                        
+  CUDA_INT_TYPE upitch;                        
   err=cuMemAllocPitch(&mat.cbegin(),&upitch,
                       cols*sizeof(typename mat_type::data_type),rows,16);
   pitch=static_cast<size_t>(upitch);                               
@@ -537,7 +537,7 @@ template <int mem1, int mem2> struct _ucl_memcpy {
                             const size_t rows) {
     if (p1::PADDED==0 || p2::PADDED==0) {
       size_t src_offset=0, dst_offset=0;
-      for (int i=0; i<rows; i++) {                       
+      for (size_t i=0; i<rows; i++) {                       
         CU_SAFE_CALL(cuMemcpyDtoD(dst.cbegin()+dst_offset,
                                   src.cbegin()+src_offset,cols));
         src_offset+=spitch;
@@ -559,7 +559,7 @@ template <int mem1, int mem2> struct _ucl_memcpy {
                             const size_t rows, CUstream &cq) {
     if (p1::PADDED==0 || p2::PADDED==0) {
       size_t src_offset=0, dst_offset=0;
-      for (int i=0; i<rows; i++) {                       
+      for (size_t i=0; i<rows; i++) {                       
         CU_SAFE_CALL(cuMemcpyDtoD(dst.cbegin()+dst_offset,
                                   src.cbegin()+src_offset,cols));
         src_offset+=spitch;

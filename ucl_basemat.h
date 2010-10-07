@@ -59,6 +59,7 @@
 class UCL_BaseMat {
  public:
   UCL_BaseMat() : _cq(0) { }
+  virtual ~UCL_BaseMat() { }
   /// Return the default command queue/stream associated with this data
   inline command_queue & cq() { return _cq; }
   /// Block until command_queue associated with matrix is complete

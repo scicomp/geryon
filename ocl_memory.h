@@ -56,10 +56,10 @@ template <class mat_type, class copy_type>
 inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,  
                        const enum UCL_MEMOPT kind) {
   cl_int error_flag;
-
   cl_context context;
   CL_SAFE_CALL(clGetMemObjectInfo(cm.cbegin(),CL_MEM_CONTEXT,sizeof(context),
                                   &context,NULL));
+
   if (kind==UCL_VIEW) {
     mat.cbegin()=clCreateBuffer(context, CL_MEM_USE_HOST_PTR,n,mat.host_ptr(),
                                 &error_flag);
@@ -72,7 +72,8 @@ inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,
                                 n,NULL,&error_flag);                        
     if (error_flag != CL_SUCCESS) 
       return UCL_MEMORY_ERROR;
-    *mat.host_ptr() = clEnqueueMapBuffer(cm.cq(),mat.cbegin(),CL_TRUE,
+    *mat.host_ptr() = (typename mat_type::data_type*)
+                      clEnqueueMapBuffer(cm.cq(),mat.cbegin(),CL_TRUE,
                                          CL_MAP_WRITE,0,n,0,NULL,NULL,NULL);
   } else {
     mat.cbegin()=clCreateBuffer(context,
@@ -80,7 +81,8 @@ inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,
                                 n,NULL,&error_flag);
     if (error_flag != CL_SUCCESS) 
       return UCL_MEMORY_ERROR;
-    *mat.host_ptr() = clEnqueueMapBuffer(cm.cq(),mat.cbegin(),CL_TRUE,
+    *mat.host_ptr() = (typename mat_type::data_type*)
+                      clEnqueueMapBuffer(cm.cq(),mat.cbegin(),CL_TRUE,
                                          CL_MAP_READ | CL_MAP_WRITE,
                                          0,n,0,NULL,NULL,NULL);
   }
@@ -105,7 +107,8 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
                                 n,NULL,&error_flag);                        
     if (error_flag != CL_SUCCESS) 
       return UCL_MEMORY_ERROR;
-    *mat.host_ptr() = clEnqueueMapBuffer(dev.cq(),mat.cbegin(),CL_TRUE,
+    *mat.host_ptr() = (typename mat_type::data_type*)
+                      clEnqueueMapBuffer(dev.cq(),mat.cbegin(),CL_TRUE,
                                          CL_MAP_WRITE,0,n,0,NULL,NULL,NULL);
   } else {
     mat.cbegin()=clCreateBuffer(dev.context(),
@@ -113,7 +116,8 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
                                 n,NULL,&error_flag);
     if (error_flag != CL_SUCCESS) 
       return UCL_MEMORY_ERROR;
-    *mat.host_ptr() = clEnqueueMapBuffer(dev.cq(),mat.cbegin(),CL_TRUE,
+    *mat.host_ptr() = (typename mat_type::data_type*)
+                      clEnqueueMapBuffer(dev.cq(),mat.cbegin(),CL_TRUE,
                                          CL_MAP_READ & CL_MAP_WRITE,
                                          0,n,0,NULL,NULL,NULL);
   }
@@ -216,7 +220,7 @@ inline void _host_zero(void *ptr, const size_t n) {
 
 inline void _ocl_build(cl_program &program, cl_device_id &device,
                        const char* options = "") {
-  cl_int error_flag = clBuildProgram(program,1,&device,options,NULL,NULL);
+  clBuildProgram(program,1,&device,options,NULL,NULL);
     
   cl_build_status build_status;
   CL_SAFE_CALL(clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_STATUS, 
@@ -403,7 +407,7 @@ template <> struct _ucl_memcpy<1,0> {
                                        (char *)dst.begin()+dst_offset,0,NULL,
                                        NULL));
     else
-      for (int i=0; i<rows; i++) {                       
+      for (size_t i=0; i<rows; i++) {                       
         CL_SAFE_CALL(clEnqueueReadBuffer(cq,src.cbegin(),block,src_offset,cols,
                                          (char *)dst.begin()+dst_offset,0,NULL,
                                          NULL));
@@ -443,7 +447,7 @@ template <> struct _ucl_memcpy<0,1> {
                                         (char *)src.begin()+src_offset,0,NULL,
                                         NULL));
     else
-      for (int i=0; i<rows; i++) {
+      for (size_t i=0; i<rows; i++) {
         CL_SAFE_CALL(clEnqueueWriteBuffer(cq,dst.cbegin(),block,dst_offset,cols,
                                           (char *)src.begin()+src_offset,0,NULL,
                                           NULL));
@@ -477,7 +481,7 @@ template <int mem1, int mem2> struct _ucl_memcpy {
                                          dst_offset,spitch*rows,0,NULL,NULL));
         
       else
-        for (int i=0; i<rows; i++) {                       
+        for (size_t i=0; i<rows; i++) {                       
           CL_SAFE_CALL(clEnqueueCopyBuffer(cq,src.cbegin(),dst.cbegin(),
                                            src_offset,dst_offset,cols,0,
                                            NULL,NULL));

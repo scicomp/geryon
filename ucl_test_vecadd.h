@@ -98,4 +98,4 @@
     
   double timer_com_s=timer_com.seconds();
   double timer_kernel_s=timer_kernel.seconds(); 
-
+  assert(timer_com_s>-1.0 && timer_kernel_s>-1.0);

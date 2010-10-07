@@ -45,7 +45,7 @@ struct NVDProperties {
   std::string name;
   int major;
   int minor;
-  unsigned totalGlobalMem;
+  CUDA_INT_TYPE totalGlobalMem;
   int multiProcessorCount;
   CUdevprop_st p;
 };
@@ -194,7 +194,6 @@ inline UCL_Device::UCL_Device() {
     CU_SAFE_CALL_NS(cuDeviceGetName(namecstr,1024,m));
     _properties.back().name=namecstr;
     
-    int minor,major;
     CU_SAFE_CALL_NS(cuDeviceComputeCapability(&_properties.back().major,
                                               &_properties.back().minor,m));
     

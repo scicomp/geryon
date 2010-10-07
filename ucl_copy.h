@@ -120,7 +120,7 @@ template <> struct _host_host_copy<1,1> {
     if ((int)mat1::DATA_TYPE==(int)mat2::DATA_TYPE && mat1::DATA_TYPE!=0)
       memcpy(dst.begin(),src.begin(),numel*sizeof(typename mat1::data_type));
     else
-      for (int i=0; i<numel; i++)
+      for (size_t i=0; i<numel; i++)
         dst[i]=static_cast<typename mat1::data_type>(src[i]);
   }
   template <class mat1, class mat2>
@@ -139,11 +139,11 @@ template <> struct _host_host_copy<1,1> {
     else
       src_row_size=src.row_size();
     if ((int)mat1::DATA_TYPE==(int)mat2::DATA_TYPE && mat1::DATA_TYPE!=0)
-      for (int i=0; i<rows; i++)
+      for (size_t i=0; i<rows; i++)
         memcpy(dst.begin()+i*dst_row_size,src.begin()+i*src_row_size,
                cols*sizeof(typename mat1::data_type));
     else
-      for (int j=0; j<rows; j++) {
+      for (size_t j=0; j<rows; j++) {
         int dst_i=j*dst_row_size;
         int d_end=dst_i+cols;
         int src_i=j*src_row_size;
@@ -181,7 +181,7 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
   static inline void cc(mat1 &dst, const mat2 &src, const size_t numel,
                         mat3 &cast_buffer) {
     ucl_mv_cpy(cast_buffer,src,numel*sizeof(typename mat2::data_type));
-    for (int i=0; i<numel; i++)
+    for (size_t i=0; i<numel; i++)
       dst[i]=static_cast<typename mat1::data_type>(cast_buffer[i]);
   }
   template <class mat1, class mat2, class mat3>
@@ -189,7 +189,7 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
                         mat3 &cast_buffer,command_queue &cq) {
     ucl_mv_cpy(cast_buffer,src,numel*sizeof(typename mat2::data_type),cq);
     cast_buffer.sync();
-    for (int i=0; i<numel; i++)
+    for (size_t i=0; i<numel; i++)
       dst[i]=static_cast<typename mat1::data_type>(cast_buffer[i]);
   }
   template <class mat1, class mat2, class mat3>
@@ -205,7 +205,7 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
     if (mat1::VECTOR) {
       ucl_mv_cpy(cast_buffer,cols*sizeof(typename mat2::data_type),src,
                  src.row_bytes(),cols*sizeof(typename mat2::data_type),rows);
-      for (int i=0; i<rows*cols; i++)
+      for (size_t i=0; i<rows*cols; i++)
         dst[i]=static_cast<typename mat1::data_type>(cast_buffer[i]);
     } else {
       if (mat2::VECTOR) 
@@ -218,8 +218,8 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
                    rows);
       int dst_i=0;
       int buff_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           dst[dst_i]=static_cast<typename mat1::data_type>(cast_buffer[buff_i]);
           buff_i++;
           dst_i++;
@@ -243,7 +243,7 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
       ucl_mv_cpy(cast_buffer,cols*sizeof(typename mat2::data_type),src,
                  src.row_bytes(),cols*sizeof(typename mat2::data_type),rows,cq);
       cast_buffer.sync();           
-      for (int i=0; i<rows*cols; i++)
+      for (size_t i=0; i<rows*cols; i++)
         dst[i]=static_cast<typename mat1::data_type>(cast_buffer[i]);
     } else {
       if (mat2::VECTOR) 
@@ -257,8 +257,8 @@ template <int host_type2> struct _ucl_cast_copy<1,host_type2> {
       cast_buffer.sync();
       int dst_i=0;
       int buff_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           dst[dst_i]=static_cast<typename mat1::data_type>(cast_buffer[buff_i]);
           buff_i++;
           dst_i++;
@@ -274,14 +274,14 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
   template <class mat1, class mat2, class mat3>
   static inline void cc(mat1 &dst, const mat2 &src, const size_t numel,
                         mat3 &cast_buffer) {
-    for (int i=0; i<numel; i++)
+    for (size_t i=0; i<numel; i++)
       cast_buffer[i]=static_cast<typename mat3::data_type>(src[i]);
     ucl_mv_cpy(dst,cast_buffer,numel*sizeof(typename mat1::data_type));
   }
   template <class mat1, class mat2, class mat3>
   static inline void cc(mat1 &dst, const mat2 &src, const size_t numel,
                         mat3 &cast_buffer, command_queue &cq) {
-    for (int i=0; i<numel; i++)
+    for (size_t i=0; i<numel; i++)
       cast_buffer[i]=static_cast<typename mat3::data_type>(src[i]);
     ucl_mv_cpy(dst,cast_buffer,numel*sizeof(typename mat1::data_type),cq);
   }
@@ -295,7 +295,7 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     if (mat2::VECTOR==0) assert(src.rows()>=rows && src.cols()>=cols);
     #endif
     if (mat2::VECTOR) {
-      for (int i=0; i<rows*cols; i++)
+      for (size_t i=0; i<rows*cols; i++)
         cast_buffer[i]=static_cast<typename mat3::data_type>(src[i]);
       ucl_mv_cpy(dst,dst.row_bytes(),cast_buffer,
                  cols*sizeof(typename mat1::data_type),
@@ -303,8 +303,8 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     } else if (mat1::VECTOR) {
       int src_i=0;
       int buf_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           cast_buffer[buf_i]=static_cast<typename mat3::data_type>(src[src_i]);
           buf_i++;
           src_i++;
@@ -315,8 +315,8 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     } else {
       int src_i=0;
       int buf_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           cast_buffer[buf_i]=static_cast<typename mat3::data_type>(src[src_i]);
           buf_i++;
           src_i++;
@@ -339,7 +339,7 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     if (mat2::VECTOR==0) assert(src.rows()>=rows && src.cols()>=cols);    
     #endif
     if (mat2::VECTOR) {
-      for (int i=0; i<rows*cols; i++)
+      for (size_t i=0; i<rows*cols; i++)
         cast_buffer[i]=static_cast<typename mat3::data_type>(src[i]);
       ucl_mv_cpy(dst,dst.row_bytes(),
                  cast_buffer,cols*sizeof(typename mat1::data_type),
@@ -347,8 +347,8 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     } else if (mat1::VECTOR) {
       int src_i=0;
       int buf_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           cast_buffer[buf_i]=static_cast<typename mat3::data_type>(src[src_i]);
           buf_i++;
           src_i++;
@@ -359,8 +359,8 @@ template <int host_type1> struct _ucl_cast_copy<host_type1,1> {
     } else {
       int src_i=0;
       int buf_i=0;
-      for (int i=0; i<rows; i++) {
-        for (int j=0; j<cols; j++) {
+      for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
           cast_buffer[buf_i]=static_cast<typename mat3::data_type>(src[src_i]);
           buf_i++;
           src_i++;
@@ -499,11 +499,13 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
     if (mat1::MEM_TYPE==1) {
       UCL_H_Vec<typename mat2::data_type> cast_buffer;
       cast_buffer.alloc(numel,dst,UCL_RW_OPTIMIZED);
-      ucl_cast_copy(dst,src,numel,cast_buffer,cq);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,numel,
+                                                        cast_buffer,cq);
     } else {
       UCL_H_Vec<typename mat1::data_type> cast_buffer;
       cast_buffer.alloc(numel,dst,UCL_WRITE_OPTIMIZED);
-      ucl_cast_copy(dst,src,numel,cast_buffer,cq);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,numel,
+                                                        cast_buffer,cq);
     }
   } else 
     ucl_mv_cpy(dst,src,numel*sizeof(typename mat2::data_type),cq); 
@@ -537,11 +539,13 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
     if (mat1::MEM_TYPE==1) {
       UCL_H_Vec<typename mat2::data_type> cast_buffer;
       cast_buffer.alloc(numel,dst,UCL_RW_OPTIMIZED);
-      ucl_cast_copy(dst,src,numel,cast_buffer,async);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,numel,
+                                                        cast_buffer);
     } else {
       UCL_H_Vec<typename mat1::data_type> cast_buffer;
       cast_buffer.alloc(numel,dst,UCL_WRITE_OPTIMIZED);
-      ucl_cast_copy(dst,src,numel,cast_buffer,async);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,numel,
+                                                        cast_buffer);
     }
   } else
     ucl_mv_cpy(dst,src,numel*sizeof(typename mat2::data_type)); 
@@ -620,11 +624,13 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t rows,
     if (mat1::MEM_TYPE==1) {
       UCL_H_Vec<typename mat2::data_type> cast_buffer;
       cast_buffer.alloc(rows*cols,dst,UCL_RW_OPTIMIZED);
-      ucl_cast_copy(dst,src,rows,cols,cast_buffer,cq);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,rows,cols,
+                                                        cast_buffer,cq);
     } else {
       UCL_H_Vec<typename mat1::data_type> cast_buffer;
       cast_buffer.alloc(rows*cols,dst,UCL_WRITE_OPTIMIZED);
-      ucl_cast_copy(dst,src,rows,cols,cast_buffer,cq);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,rows,cols,
+                                                        cast_buffer,cq);
     }
   // If we are here, at least one of the matrices must have VECTOR=0
   } else if (mat1::VECTOR) {
@@ -676,18 +682,18 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t rows,
     ucl_copy(dst,src,rows,cols,dst.cq());
   else if (mat1::MEM_TYPE==1 && mat2::MEM_TYPE==1)
     _host_host_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::hhc(dst,src,rows,cols);
-  else if (async)
-    ucl_copy(dst,src,rows,cols,dst.cq());
   else if ((int)mat1::DATA_TYPE!=(int)mat2::DATA_TYPE && 
            (mat1::MEM_TYPE==1 || mat2::MEM_TYPE==1)) {
     if (mat1::MEM_TYPE==1) {
       UCL_H_Vec<typename mat2::data_type> cast_buffer;
       cast_buffer.alloc(rows*cols,dst,UCL_RW_OPTIMIZED);
-      ucl_cast_copy(dst,src,rows,cols,cast_buffer,async);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,rows,cols,
+                                                        cast_buffer);
     } else {
       UCL_H_Vec<typename mat1::data_type> cast_buffer;
       cast_buffer.alloc(rows*cols,dst,UCL_WRITE_OPTIMIZED);
-      ucl_cast_copy(dst,src,rows,cols,cast_buffer,async);
+      _ucl_cast_copy<mat1::MEM_TYPE,mat2::MEM_TYPE>::cc(dst,src,rows,cols,
+                                                        cast_buffer);
     }
   // If we are here, at least one of the matrices must have VECTOR=0
   } else if (mat1::VECTOR) {

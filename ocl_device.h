@@ -107,11 +107,12 @@ class UCL_Device {
   inline int num_queues() 
     { return _cq.size(); }
   
-  /// Add a stream for device computations
+  /// Add a command queue for device computations (with profiling enabled)
   inline void push_command_queue() {
     cl_int errorv;
     _cq.push_back(cl_command_queue());
-    _cq.back()=clCreateCommandQueue(_context,_cl_device,0,&errorv);
+    _cq.back()=clCreateCommandQueue(_context,_cl_device,
+                                    CL_QUEUE_PROFILING_ENABLE,&errorv);
     if (errorv!=CL_SUCCESS) {
       std::cerr << "Could not create command queue on device: " << name() 
                 << std::endl;
@@ -263,7 +264,7 @@ inline UCL_Device::UCL_Device() {
 
 inline UCL_Device::~UCL_Device() {
   if (_device>-1) {
-    for (int i=0; i<_cq.size(); i++) {
+    for (size_t i=0; i<_cq.size(); i++) {
       CL_SAFE_CALL(clReleaseCommandQueue(_cq.back()));
       _cq.pop_back();
     }
@@ -332,7 +333,6 @@ inline void UCL_Device::add_properties(cl_device_id device_list) {
 }
 
 inline std::string UCL_Device::platform_name() {
-  cl_int errorv;
   char info[1024];
   
   CL_SAFE_CALL(clGetPlatformInfo(_cl_platform,CL_PLATFORM_VENDOR,1024,info,
@@ -380,7 +380,7 @@ inline void UCL_Device::set(int num) {
     return;
   
   if (_device>-1) {
-    for (int i=0; i<_cq.size(); i++) {
+    for (size_t i=0; i<_cq.size(); i++) {
       CL_SAFE_CALL(clReleaseCommandQueue(_cq.back()));
       _cq.pop_back();
     }

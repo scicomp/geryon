@@ -39,7 +39,7 @@ class UCL_H_Vec : public UCL_BaseMat {
    };
    typedef numtyp data_type; 
    
-  UCL_H_Vec() : _cols(0), _kind(UCL_VIEW) { }
+  UCL_H_Vec() : _kind(UCL_VIEW), _cols(0) { }
   ~UCL_H_Vec() { if (_kind!=UCL_VIEW) _host_free(*this,_kind); }
   
   /// Construct with n columns
@@ -340,7 +340,7 @@ class UCL_H_Vec : public UCL_BaseMat {
     { return _array[col]; }
   
   /// Returns pointer to memory pointer for allocation on host
-  inline void ** host_ptr() { return (void **)&_array; }
+  inline numtyp ** host_ptr() { return &_array; }
   
   /// Return the offset (in elements) from begin() pointer where data starts
   /** \note Always 0 for host matrices and CUDA APIs **/

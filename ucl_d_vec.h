@@ -368,13 +368,13 @@ class UCL_D_Vec : public UCL_BaseMat {
   /// Returns an API specific device pointer
   /** - For OpenCL, returns a &cl_mem object
     * - For CUDA Driver, returns a &CUdeviceptr
-    * - For CUDA-RT, returns void** **/
-  inline void ** cbegin() { return (void **)&_array; }
+    * - For CUDA-RT, returns numtyp** **/
+  inline numtyp ** cbegin() { return &_array; }
   /// Returns an API specific device pointer
   /** - For OpenCL, returns a &cl_mem object
     * - For CUDA Driver, returns a &CUdeviceptr
-    * - For CUDA-RT, returns void** **/
-  inline const void ** cbegin() const { return (const void **)&_array; }
+    * - For CUDA-RT, returns numtyp** **/
+  inline const numtyp ** cbegin() const { return &_array; }
   /// For CUDA-RT, allocate row vector and bind texture
   inline void safe_alloc(const size_t cols, UCL_Device &dev,
                          textureReference *t) 
