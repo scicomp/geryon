@@ -10,7 +10,7 @@
 #
 #    begin                : Thu November 12 2009
 #    copyright            : (C) 2009 by W. Michael Brown
-#    email                : wmbrown@sandia.gov
+#    email                : brownw@ornl.gov
 # ***************************************************************************/
 
 BIN_DIR = ../../../bin

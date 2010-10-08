@@ -11,7 +11,7 @@
 
     begin                : Thu Jan 21 2010
     copyright            : (C) 2010 by W. Michael Brown
-    email                : wmbrown@sandia.gov
+    email                : brownw@ornl.gov
  ***************************************************************************/
 
 /* -----------------------------------------------------------------------
@@ -212,7 +212,7 @@ inline UCL_Device::UCL_Device() {
 inline UCL_Device::~UCL_Device() {
   if (_device>-1) {
     for (int i=1; i<num_queues(); i++) pop_command_queue();
-    CU_SAFE_CALL_NS(cuCtxDestroy(_context));
+    cuCtxDestroy(_context);
   }
 }
 

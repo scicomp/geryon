@@ -8,6 +8,6 @@ mkdir /tmp/cpp5678/geryon
 foreach file ( $files )
 	/bin/cp $file /tmp/cpp5678/$file:t:t
 	# ------ Sed Replace
-	sed 's/UCL_Vec/UCL_D_Vec/g' /tmp/cpp5678/$file:t:t > $file
+	sed 's/wmbrown@sandia/brownw@ornl/g' /tmp/cpp5678/$file:t:t > $file
 end
 
