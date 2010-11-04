@@ -48,6 +48,11 @@ struct NVDProperties {
   CUDA_INT_TYPE totalGlobalMem;
   int multiProcessorCount;
   CUdevprop_st p;
+  int kernelExecTimeoutEnabled;
+  int integrated;
+  int canMapHostMemory;
+  int concurrentKernels;
+  int ECCEnabled;
 };
 
 /// Class for looking at device properties
@@ -199,10 +204,28 @@ inline UCL_Device::UCL_Device() {
     
     CU_SAFE_CALL_NS(cuDeviceTotalMem(&_properties.back().totalGlobalMem,m));
     CU_SAFE_CALL_NS(cuDeviceGetAttribute(&_properties.back().multiProcessorCount,
-                                         CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
+                                       CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
                                          m));
-    
     CU_SAFE_CALL_NS(cuDeviceGetProperties(&_properties.back().p,m));
+    #if CUDA_VERSION >= 2020
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().kernelExecTimeoutEnabled, 
+                      CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT,dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().integrated,
+                      CU_DEVICE_ATTRIBUTE_INTEGRATED, dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().canMapHostMemory, 
+                      CU_DEVICE_ATTRIBUTE_CAN_MAP_HOST_MEMORY, dev));
+    #endif
+    #if CUDA_VERSION >= 3000
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().concurrentKernels, 
+                      CU_DEVICE_ATTRIBUTE_CONCURRENT_KERNELS, dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().ECCEnabled,  
+                      CU_DEVICE_ATTRIBUTE_ECC_ENABLED, dev));
+    #endif
   }
   _device=-1;
   _cq.push_back(CUstream());
@@ -231,6 +254,14 @@ inline void UCL_Device::set(int num) {
 
 // List all devices along with all properties
 inline void UCL_Device::print_all(std::ostream &out) {
+  #if CUDA_VERSION >= 2020
+  int driver_version;
+  cuDriverGetVersion(&driver_version);
+  out << "CUDA Driver Version:                           "
+      << driver_version/1000 << "." << driver_version%100
+		  << std::endl;
+  #endif
+
   if (num_devices() == 0)
     out << "There is no device supporting CUDA\n";
   for (int i=0; i<num_devices(); ++i) {
@@ -246,7 +277,7 @@ inline void UCL_Device::print_all(std::ostream &out) {
       out << "No\n";
     out << "  Total amount of global memory:                 "
         << gigabytes(i) << " GB\n";
-    #if CUDART_VERSION >= 2000
+    #if CUDA_VERSION >= 2000
     out << "  Number of compute units/multiprocessors:       "
         << _properties[i].multiProcessorCount << std::endl;
     out << "  Number of cores:                               "
@@ -276,6 +307,35 @@ inline void UCL_Device::print_all(std::ostream &out) {
         << _properties[i].p.textureAlign << " bytes\n";
     out << "  Clock rate:                                    "
         << clock_rate(i) << " GHz\n";
+    #if CUDA_VERSION >= 2020
+    out << "  Run time limit on kernels:                     ";
+    if (_properties[i].kernelExecTimeoutEnabled)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Integrated:                                    ";
+    if (_properties[i].integrated)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Support host page-locked memory mapping:       ";
+    if (_properties[i].canMapHostMemory)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    #endif
+    #if CUDA_VERSION >= 3000
+    out << "  Concurrent kernel execution:                   ";
+    if (_properties[i].concurrentKernels)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Device has ECC support enabled:                ";
+    if (_properties[i].ECCEnabled)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    #endif
   }
 }
 

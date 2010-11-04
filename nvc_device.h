@@ -200,6 +200,18 @@ inline void UCL_Device::set(int num) {
 
 // List all devices along with all properties
 inline void UCL_Device::print_all(std::ostream &out) {
+  #if CUDART_VERSION >= 2020
+  int driver_version, runtime_version;
+  cudaDriverGetVersion(&driver_version);
+  out << "CUDA Driver Version:                           "
+      << driver_version/1000 << "." << driver_version%100
+		  << std::endl;
+  cudaRuntimeGetVersion(&runtime_version);
+	out << "CUDA Runtime Version:                          "
+	    << runtime_version/1000 << "." << runtime_version%100
+	    << std::endl;
+  #endif
+
   if (num_devices() == 0)
     out << "There is no device supporting CUDA\n";
   for (int i=0; i<num_devices(); ++i) {
@@ -248,6 +260,44 @@ inline void UCL_Device::print_all(std::ostream &out) {
     #if CUDART_VERSION >= 2000
     out << "  Concurrent copy and execution:                 ";
     if (_properties[i].deviceOverlap)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    #endif
+    #if CUDART_VERSION >= 2020
+    out << "  Run time limit on kernels:                     ";
+    if (_properties[i].kernelExecTimeoutEnabled)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Integrated:                                    ";
+    if (_properties[i].integrated)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Support host page-locked memory mapping:       ";
+    if (_properties[i].canMapHostMemory)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Compute mode:                                  ";
+    if (_properties[i].computeMode == cudaComputeModeDefault)
+      out << "Default\n"; // multiple threads can use device
+    else if (_properties[i].computeMode == cudaComputeModeExclusive)
+      out << "Exclusive\n"; // only thread can use device
+    else if (_properties[i].computeMode == cudaComputeModeProhibited)
+      out << "Prohibited\n"; // no thread can use device
+    else
+      out << "Unknown\n";
+    #endif
+    #if CUDART_VERSION >= 3000
+    out << "  Concurrent kernel execution:                   ";
+    if (_properties[i].concurrentKernels)
+      out << "Yes\n";
+    else
+      out << "No\n";
+    out << "  Device has ECC support enabled:                ";
+    if (_properties[i].ECCEnabled)
       out << "Yes\n";
     else
       out << "No\n";
