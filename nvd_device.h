@@ -162,9 +162,9 @@ class UCL_Device {
   inline size_t free_bytes() { return free_bytes(_device); }
   // Get the bytes of free memory
   inline size_t free_bytes(const int i) { 
-    size_t dfree, dtotal;
+    CUDA_INT_TYPE dfree, dtotal;
     CU_SAFE_CALL_NS(cuMemGetInfo(&dfree, &dtotal));
-    return dfree;
+    return static_cast<size_t>(dfree);
   }
 
   /// Return the GPGPU compute capability for current device
@@ -233,7 +233,7 @@ inline UCL_Device::UCL_Device() {
                       &_properties.back().canMapHostMemory, 
                       CU_DEVICE_ATTRIBUTE_CAN_MAP_HOST_MEMORY, dev));
     #endif
-    #if CUDA_VERSION >= 3000
+    #if CUDA_VERSION >= 3010
     CU_SAFE_CALL_NS(cuDeviceGetAttribute(
                       &_properties.back().concurrentKernels, 
                       CU_DEVICE_ATTRIBUTE_CONCURRENT_KERNELS, dev));
@@ -339,7 +339,7 @@ inline void UCL_Device::print_all(std::ostream &out) {
     else
       out << "No\n";
     #endif
-    #if CUDA_VERSION >= 3000
+    #if CUDA_VERSION >= 3010
     out << "  Concurrent kernel execution:                   ";
     if (_properties[i].concurrentKernels)
       out << "Yes\n";
