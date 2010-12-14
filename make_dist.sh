@@ -2,14 +2,14 @@
 
 cd /tmp
 rm -rf geryon
-cp -R /homes/wb8/code/svn/geryon .
+cp -R /homes/wb8/code/git/geryon .
 cd geryon
 rm replace_code.sh
 rm make_dist.sh
 rm todo.txt
 rm *.kdev*
-set files = `find ./ -name '.svn'`
-rm -rf $files
+#set files = `find ./ -name '.svn'`
+#rm -rf $files
 rm geryon.pptx
 
 set version=`date +'%y.%j'`
@@ -20,5 +20,5 @@ cd ../
 tar -cvf geryon.$version.tar geryon
 gzip geryon.$version.tar
 
-cd /homes/wb8/code/svn/geryon
+cd /homes/wb8/code/git/geryon
 echo "File geryon.$version.tar.gz located in /tmp"
