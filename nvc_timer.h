@@ -41,8 +41,8 @@ class UCL_Timer {
   /** \note init() must be called to reuse timer after a clear() **/
   inline void clear() {
     if (_initialized) { 
-      CUDA_SAFE_CALL(cudaEventDestroy(start_event));
-      CUDA_SAFE_CALL(cudaEventDestroy(stop_event));
+      CUDA_DESTRUCT_CALL(cudaEventDestroy(start_event));
+      CUDA_DESTRUCT_CALL(cudaEventDestroy(stop_event));
       _initialized=false;
       _total_time=0.0;
     }

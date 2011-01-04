@@ -77,7 +77,7 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
 template <class mat_type>
 inline void _host_free(mat_type &mat, const enum UCL_MEMOPT kind) {
   if (kind!=UCL_NOT_PINNED)
-    CUDA_SAFE_CALL(cudaFreeHost(mat.begin()));
+    CUDA_DESTRUCT_CALL(cudaFreeHost(mat.begin()));
   else
     free(mat.begin());
 }
@@ -127,7 +127,7 @@ inline int _device_alloc(mat_type &mat, UCL_Device &d, const size_t rows,
 
 template <class mat_type>
 inline void _device_free(mat_type &mat) {
-  CUDA_SAFE_CALL(cudaFree(mat.begin()));
+  CUDA_DESTRUCT_CALL(cudaFree(mat.begin()));
 }
 
 template <class numtyp>
@@ -158,7 +158,7 @@ inline void _device_image_alloc(mat_type &mat, UCL_Device &d, const size_t rows,
 
 template <class mat_type>
 inline void _device_image_free(mat_type &mat) {
-  CUDA_SAFE_CALL(cudaFreeArray(mat.begin()));
+  CUDA_DESTRUCT_CALL(cudaFreeArray(mat.begin()));
 }
 
 // --------------------------------------------------------------------------

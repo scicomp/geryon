@@ -12,6 +12,11 @@
 #define OCL_GERYON_EXIT assert(0==1)
 #endif
 
+#ifdef UCL_DEBUG
+#define UCL_SYNC_DEBUG
+#define UCL_DESTRUCT_CHECK
+#endif
+
 #ifndef UCL_NO_API_CHECK
 
 #  define CL_SAFE_CALL( call) do {                                         \
@@ -34,6 +39,16 @@
 // void macros for performance reasons
 #  define CL_SAFE_CALL( call) call
 #  define CL_CHECK_ERR( val)
+
+#endif
+
+#ifdef UCL_DESTRUCT_CHECK
+
+#define CL_DESTRUCT_CALL( call) CL_SAFE_CALL( call)
+
+#else
+
+#define CL_DESTRUCT_CALL( call) call
 
 #endif
 

@@ -128,8 +128,8 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
 
 template <class mat_type>
 inline void _host_free(mat_type &mat, const enum UCL_MEMOPT kind) {
-  CL_SAFE_CALL(clReleaseMemObject(mat.cbegin()));
-  CL_SAFE_CALL(clReleaseCommandQueue(mat.cq()));
+  CL_DESTRUCT_CALL(clReleaseMemObject(mat.cbegin()));
+  CL_DESTRUCT_CALL(clReleaseCommandQueue(mat.cq()));
 }
 
 // --------------------------------------------------------------------------
@@ -207,8 +207,8 @@ inline int _device_alloc(mat_type &mat, UCL_Device &dev, const size_t rows,
 
 template <class mat_type>
 inline void _device_free(mat_type &mat) {
-  CL_SAFE_CALL(clReleaseMemObject(mat.cbegin()));
-  CL_SAFE_CALL(clReleaseCommandQueue(mat.cq()));
+  CL_DESTRUCT_CALL(clReleaseMemObject(mat.cbegin()));
+  CL_DESTRUCT_CALL(clReleaseCommandQueue(mat.cq()));
 }
 
 // --------------------------------------------------------------------------
