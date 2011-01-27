@@ -25,6 +25,7 @@
 #define NVC_TIMER_H
 
 #include "nvc_macros.h"
+#include "nvc_device.h"
 
 namespace ucl_cudart {
 
@@ -66,11 +67,22 @@ class UCL_Timer {
   /// Stop timing on command queue
   inline void stop() { CUDA_SAFE_CALL(cudaEventRecord(stop_event,_cq)); }
   
+  /// Block until the start event has been reached on device
+  inline void sync_start() 
+    { CUDA_SAFE_CALL(cudaEventSynchronize(start_event)); }
+
+  /// Block until the stop event has been reached on device
+  inline void sync_stop() 
+    { CUDA_SAFE_CALL(cudaEventSynchronize(stop_event)); }
+
   /// Set the time elapsed to zero (not the total_time)
   inline void zero() {
     CUDA_SAFE_CALL(cudaEventRecord(start_event,_cq));
     CUDA_SAFE_CALL(cudaEventRecord(stop_event,_cq));
-  } 
+  }
+  
+  /// Set the total time to zero
+  inline void zero_total() { _total_time=0.0; }
   
   /// Add time from previous start and stop to total
   /** Forces synchronization **/
