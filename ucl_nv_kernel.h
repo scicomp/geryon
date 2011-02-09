@@ -38,5 +38,6 @@
 #define mul24 __mul24
 #define __global  
 #define __inline static __inline__ __device__ 
+#define atom_add atomicAdd
 
 #endif
