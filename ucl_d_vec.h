@@ -60,19 +60,23 @@ class UCL_D_Vec : public UCL_BaseMat {
                    const enum UCL_MEMOPT kind=UCL_READ_WRITE) {
                         
     clear();
-    _kind=kind;
-    _cols=cols;
+
     _row_bytes=cols*sizeof(numtyp);
     int err=_device_alloc(*this,cq,_row_bytes,kind);
-    #ifndef _UCL_DEVICE_PTR_MAT
-    _end=_array+cols;
-    #endif
-    #ifndef UCL_NO_EXIT
     if (err!=UCL_SUCCESS) {
+      _row_bytes=0;
+      #ifndef UCL_NO_EXIT
       std::cerr << "UCL Error: Could not allocate " << _row_bytes
                 << " bytes on device.\n";
       exit(1);
+      #endif
+      return err;
     }
+
+    _kind=kind;
+    _cols=cols;
+    #ifndef _UCL_DEVICE_PTR_MAT
+    _end=_array+cols;
     #endif
     #ifdef _OCL_MAT
     _offset=0;
@@ -90,19 +94,22 @@ class UCL_D_Vec : public UCL_BaseMat {
   inline int alloc(const size_t cols, UCL_Device &device,
                    const enum UCL_MEMOPT kind=UCL_READ_WRITE) {
     clear();
-    _kind=kind;
-    _cols=cols;
     _row_bytes=cols*sizeof(numtyp);
     int err=_device_alloc(*this,device,_row_bytes,kind);
-    #ifndef _UCL_DEVICE_PTR_MAT
-    _end=_array+cols;
-    #endif
-    #ifndef UCL_NO_EXIT
     if (err!=UCL_SUCCESS) {
+      _row_bytes=0;
+      #ifndef UCL_NO_EXIT
       std::cerr << "UCL Error: Could not allocate " << _row_bytes
                 << " bytes on device.\n";
       exit(1);
+      #endif
+      return err;
     }
+
+    _kind=kind;
+    _cols=cols;
+    #ifndef _UCL_DEVICE_PTR_MAT
+    _end=_array+cols;
     #endif
     #ifdef _OCL_MAT
     _offset=0;
