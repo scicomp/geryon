@@ -7,6 +7,8 @@ cd geryon
 rm replace_code.sh
 rm make_dist.sh
 rm todo.txt
+rm Makefile.firefly_mac
+rm *~
 rm *.kdev*
 #set files = `find ./ -name '.svn'`
 #rm -rf $files
