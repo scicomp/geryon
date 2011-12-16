@@ -52,7 +52,7 @@ class UCL_Program {
       #ifndef UCL_NO_EXIT 
       std::cerr << "UCL Error: Could not open kernel file: " 
                 << filename << std::endl;
-      exit(1);
+      UCL_GERYON_EXIT;
       #endif
       return UCL_FILE_NOT_FOUND;
     }
@@ -108,14 +108,14 @@ class UCL_Program {
       #ifndef UCL_NO_EXIT 
       std::cerr << "UCL Error: Could not open binary kernel file: " 
                 << filename << std::endl;
-      exit(1);
+      UCL_GERYON_EXIT;
       #endif
       return UCL_FILE_NOT_FOUND;
     } else if (err!=CUDA_SUCCESS) {
       #ifndef UCL_NO_EXIT 
       std::cerr << "UCL Error: Error loading binary kernel file: " 
                 << filename << std::endl;
-      exit(1);
+      UCL_GERYON_EXIT;
       #endif
       return UCL_FILE_NOT_FOUND;
     }
@@ -156,7 +156,7 @@ class UCL_Kernel {
       #ifndef UCL_NO_EXIT
       std::cerr << "UCL Error: Could not find function: " << function
                 << " in program.\n";
-      exit(1);
+      UCL_GERYON_EXIT;
       #endif
       return UCL_FUNCTION_NOT_FOUND;
     }

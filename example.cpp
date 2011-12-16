@@ -43,7 +43,7 @@ using namespace std;
 
 int main() {  
   // Set the active device and initialize timers
-  UCL_Device dev;  if (dev.num_devices()==0) exit(1);  dev.set(0);
+  UCL_Device dev;  if (dev.num_devices()==0) UCL_GERYON_EXIT;  dev.set(0);
   UCL_Timer timer_com(dev), timer_kernel(dev);
   
   // Load/compile the kernel
