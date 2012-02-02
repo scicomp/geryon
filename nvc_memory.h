@@ -54,6 +54,7 @@ inline int _host_alloc(mat_type &mat, copy_type &cm, const size_t n,
   }
   if (err!=cudaSuccess || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
+  mat.cq()=cm.cq();
   return UCL_SUCCESS;
 }
 
@@ -71,6 +72,7 @@ inline int _host_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
   }
   if (err!=cudaSuccess || *(mat.host_ptr())==NULL)
     return UCL_MEMORY_ERROR;
+  mat.cq()=dev.cq();
   return UCL_SUCCESS;
 }
 
@@ -91,6 +93,7 @@ inline int _device_alloc(mat_type &mat, copy_type &cm, const size_t n,
   cudaError err=cudaMalloc(mat.cbegin(),n);
   if (err==cudaSuccess)
     return UCL_SUCCESS;
+  mat.cq()=cm.cq();
   return UCL_MEMORY_ERROR;
 }
 
@@ -100,6 +103,7 @@ inline int _device_alloc(mat_type &mat, UCL_Device &dev, const size_t n,
   cudaError err=cudaMalloc(mat.cbegin(),n);
   if (err==cudaSuccess)
     return UCL_SUCCESS;
+  mat.cq()=dev.cq();
   return UCL_MEMORY_ERROR;
 }
 
@@ -111,6 +115,7 @@ inline int _device_alloc(mat_type &mat, copy_type &cm, const size_t rows,
                                 cols*sizeof(typename mat_type::data_type),rows);
   if (err==cudaSuccess)
     return UCL_SUCCESS;
+  mat.cq()=cm.cq();
   return UCL_MEMORY_ERROR;
 }    
 
@@ -122,6 +127,7 @@ inline int _device_alloc(mat_type &mat, UCL_Device &d, const size_t rows,
                                 cols*sizeof(typename mat_type::data_type),rows);
   if (err==cudaSuccess)
     return UCL_SUCCESS;
+  mat.cq()=d.cq();
   return UCL_MEMORY_ERROR;
 }    
 
@@ -148,12 +154,14 @@ template <class mat_type, class copy_type>
 inline void _device_image_alloc(mat_type &mat, copy_type &cm, const size_t rows,
                                 const size_t cols) {
   CUDA_SAFE_CALL(cudaMallocArray(mat.cbegin(),mat.channel(),cols,rows));
+  mat.cq()=cm.cq();
 }    
 
 template <class mat_type, class copy_type>
 inline void _device_image_alloc(mat_type &mat, UCL_Device &d, const size_t rows,
                          const size_t cols) {
   CUDA_SAFE_CALL(cudaMallocArray(mat.cbegin(),mat.channel(),cols,rows));
+  mat.cq()=d.cq();
 }    
 
 template <class mat_type>
@@ -228,28 +236,19 @@ template<int image, int image2> struct _ucl_memcpy;
 template<> struct _ucl_memcpy<2,2> {
   template <class p1, class p2>
   static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpyArrayToArray(dst,0,0,src,0,0,n,kind));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind, cudaStream_t &cq) {
+                        const enum cudaMemcpyKind kind, cudaStream_t &cq,
+                        const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpyArrayToArrayAsync(dst,0,0,src,0,0,n,kind,cq));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpy2DArrayToArray(dst,0,0,src,0,0,cols,rows,kind));
-
+    if (block) ucl_sync(cq);
   }
   template <class p1, class p2>
       static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
                             const size_t spitch, const size_t cols,
                             const size_t rows, const enum cudaMemcpyKind kind,
-                            cudaStream_t &cq) {
+                            cudaStream_t &cq, const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpy2DArrayToArrayAsync(dst,0,0,src,0,0,cols,rows,
                                                  kind,cq));
+    if (block) ucl_sync(cq);
   }
 };
 
@@ -257,27 +256,19 @@ template<> struct _ucl_memcpy<2,2> {
 template<int image2> struct _ucl_memcpy<2,image2> {
   template <class p1, class p2>
   static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpyToArray(dst,0,0,src,n,kind));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind, cudaStream_t &cq) {
+                        const enum cudaMemcpyKind kind, cudaStream_t &cq,
+                        const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpyToArrayAsync(dst,0,0,src,n,kind,cq));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpy2DToArray(dst,0,0,src,spitch,cols,rows,kind));
+    if (block) ucl_sync(cq);
   }
   template <class p1, class p2>
   static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
                         const size_t spitch, const size_t cols,
                         const size_t rows, const enum cudaMemcpyKind kind,
-                        cudaStream_t &cq) {
+                        cudaStream_t &cq, const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpy2DToArrayAsync(dst,0,0,src,spitch,cols,rows,
                                             kind,cq));
+    if (block) ucl_sync(cq);
   }
 };
 
@@ -285,27 +276,19 @@ template<int image2> struct _ucl_memcpy<2,image2> {
 template<int image1> struct _ucl_memcpy<image1,2> {
   template <class p1, class p2>
   static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpyFromArray(dst,src,0,0,n,kind));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind, cudaStream_t &cq) {
+                        const enum cudaMemcpyKind kind, cudaStream_t &cq,
+                        const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpyFromArray(dst,src,0,0,n,kind,cq));
-  }
-  template <class p1, class p2>
-      static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
-                            const size_t spitch, const size_t cols,
-                            const size_t rows, const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpy2DFromArray(dst,dpitch,src,0,0,cols,rows,kind));
+    if (block) ucl_sync(cq);
   }
   template <class p1, class p2>
   static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
                         const size_t spitch, const size_t cols,
                         const size_t rows, const enum cudaMemcpyKind kind,
-                        cudaStream_t &cq) {
+                        cudaStream_t &cq, const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpy2DFromArrayAsync(dst,dpitch,src,0,0,cols,rows,
                                               kind,cq));
+    if (block) ucl_sync(cq);
   }
 };
 
@@ -313,27 +296,19 @@ template<int image1> struct _ucl_memcpy<image1,2> {
 template <int image1, int image2> struct _ucl_memcpy {
   template <class p1, class p2>
   static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpy(dst,src,n,kind));
-  }
-  template <class p1, class p2>
-  static inline void mc(p1 dst, const p2 src, const size_t n,
-                        const enum cudaMemcpyKind kind, cudaStream_t &cq) {
+                        const enum cudaMemcpyKind kind, cudaStream_t &cq,
+                        const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpyAsync(dst,src,n,kind,cq));
-  }
-  template <class p1, class p2>
-      static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
-                            const size_t spitch, const size_t cols,
-                            const size_t rows, const enum cudaMemcpyKind kind) {
-    CUDA_SAFE_CALL(cudaMemcpy2D(dst,dpitch,src,spitch,cols,rows,kind));
+    if (block) ucl_sync(cq);
   }
   template <class p1, class p2>
   static inline void mc(p1 dst, const size_t dpitch, const p2 src, 
                         const size_t spitch, const size_t cols,
                         const size_t rows, const enum cudaMemcpyKind kind,
-                        cudaStream_t &cq) {
+                        cudaStream_t &cq, const bool block=false) {
     CUDA_SAFE_CALL(cudaMemcpy2DAsync(dst,dpitch,src,spitch,cols,rows,kind,
                                      cq));
+    if (block) ucl_sync(cq);
   }
 };
 
@@ -341,7 +316,8 @@ template<class mat1, class mat2>
 inline void ucl_mv_cpy(mat1 &dst, const mat2 &src, const size_t n) {
   _ucl_memcpy<mat1::MEM_TYPE,mat2::MEM_TYPE>::mc(dst.begin(),src.begin(),n,
                                                  _CUDA_TRAN<mat1::MEM_TYPE,
-                                                        mat2::MEM_TYPE>::a());
+                                                        mat2::MEM_TYPE>::a(),
+                                                        dst.cq(),true);
 }
 
 template<class mat1, class mat2>
@@ -366,7 +342,8 @@ inline void ucl_mv_cpy(mat1 &dst, const size_t dpitch, const mat2 &src,
   _ucl_memcpy<mat1::MEM_TYPE,mat2::MEM_TYPE>::mc(dst.begin(),dpitch,src.begin(),
                                                  spitch,cols,rows,
                                                  _CUDA_TRAN<mat1::MEM_TYPE,
-                                                        mat2::MEM_TYPE>::a());
+                                                        mat2::MEM_TYPE>::a(),
+                                                        dst.cq(),true);
 }
 
 template<class mat1, class mat2>

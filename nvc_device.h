@@ -77,6 +77,14 @@ class UCL_Device {
   /// Returns the stream indexed by i
   inline command_queue & cq(const int i) { return _cq[i]; }
 
+  /// Set the default command queue (by default this is the null stream)
+  /** \param i index of the command queue (as added by push_command_queue()) 
+      If i is 0, the default command queue is set to the null stream **/
+  inline void set_command_queue(const int i) {
+    if (i==0) _cq[0]=0;
+    else _cq[0]=_cq[i];
+  }
+  
   /// Block until all commands in the default stream have completed
   inline void sync() { sync(0); }
   
@@ -205,6 +213,7 @@ inline int UCL_Device::set(int num) {
   if (_device==num)
     return UCL_SUCCESS;
   for (int i=1; i<num_queues(); i++) pop_command_queue();
+  _cq[0]=0;
   cudaThreadExit();
   cudaError err=cudaSetDevice(_device_ids[num]);
   if (err!=cudaSuccess) {
