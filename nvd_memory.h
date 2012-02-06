@@ -235,15 +235,30 @@ template<int mem1, int mem2> struct _ucl_memcpy;
 // Both are images
 template<> struct _ucl_memcpy<2,2> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
     assert(0==1);
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    assert(0==1);
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstArray=dst.cbegin();
+    ins.srcArray=src.cbegin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -251,22 +266,36 @@ template<> struct _ucl_memcpy<2,2> {
     ins.dstArray=dst.cbegin();
     ins.srcArray=src.cbegin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Destination is texture, source on device
 template<> struct _ucl_memcpy<2,0> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
     assert(0==1);
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    assert(0==1);
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstArray=dst.cbegin();
+    ins.srcDevice=src.cbegin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -274,22 +303,36 @@ template<> struct _ucl_memcpy<2,0> {
     ins.dstArray=dst.cbegin();
     ins.srcDevice=src.cbegin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Destination is texture, source on host
 template<> struct _ucl_memcpy<2,1> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
     assert(0==1);
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    assert(0==1);
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstArray=dst.cbegin();
+    ins.srcHost=src.begin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -297,22 +340,36 @@ template<> struct _ucl_memcpy<2,1> {
     ins.dstArray=dst.cbegin();
     ins.srcHost=src.begin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Source is texture, dest on device
 template<> struct _ucl_memcpy<0,2> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
     assert(0==1);
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq, 
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    assert(0==1);
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstDevice=dst.cbegin();
+    ins.srcArray=src.cbegin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -320,22 +377,36 @@ template<> struct _ucl_memcpy<0,2> {
     ins.dstDevice=dst.cbegin();
     ins.srcArray=src.cbegin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Source is texture, dest on host
 template<> struct _ucl_memcpy<1,2> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
     assert(0==1);
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq, 
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    assert(0==1);
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstHost=dst.begin();
+    ins.srcArray=src.cbegin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -343,23 +414,36 @@ template<> struct _ucl_memcpy<1,2> {
     ins.dstHost=dst.begin();
     ins.srcArray=src.cbegin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Neither are textures, destination on host
 template <> struct _ucl_memcpy<1,0> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
-    CU_SAFE_CALL(cuMemcpyDtoHAsync(dst.begin(),src.cbegin(),n,cq));
-    if (block) ucl_sync(cq);
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
+    CU_SAFE_CALL(cuMemcpyDtoH(dst.begin(),src.cbegin(),n));
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    CU_SAFE_CALL(cuMemcpyDtoHAsync(dst.begin(),src.cbegin(),n,cq));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstHost=dst.begin();
+    ins.srcDevice=src.cbegin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -367,23 +451,36 @@ template <> struct _ucl_memcpy<1,0> {
     ins.dstHost=dst.begin();
     ins.srcDevice=src.cbegin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Neither are textures, source on host
 template <> struct _ucl_memcpy<0,1> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
-    CU_SAFE_CALL(cuMemcpyHtoDAsync(dst.cbegin(),src.begin(),n,cq));
-    if (block) ucl_sync(cq);
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
+    CU_SAFE_CALL(cuMemcpyHtoD(dst.cbegin(),src.begin(),n));
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    CU_SAFE_CALL(cuMemcpyHtoDAsync(dst.cbegin(),src.begin(),n,cq));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstDevice=dst.cbegin();
+    ins.srcHost=src.begin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -391,21 +488,34 @@ template <> struct _ucl_memcpy<0,1> {
     ins.dstDevice=dst.cbegin();
     ins.srcHost=src.begin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Neither are textures, both on host
 template <> struct _ucl_memcpy<1,1> {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false)
+  static inline void mc(p1 &dst, const p2 &src, const size_t n)
     { memcpy(dst.begin(),src.begin(),n); }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq)
+    { memcpy(dst.begin(),src.begin(),n); }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    CUDA_MEMCPY2D ins;
+    _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+    ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+    ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+    ins.dstHost=dst.begin();
+    ins.srcHost=src.begin();
+    CU_SAFE_CALL(cuMemcpy2D(&ins));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     CUDA_MEMCPY2D ins;
     _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
     ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
@@ -413,23 +523,46 @@ template <> struct _ucl_memcpy<1,1> {
     ins.dstHost=dst.begin();
     ins.srcHost=src.begin();
     CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
-    if (block) ucl_sync(cq);
   }
 };
 
 // Neither are textures, both on device
 template <int mem1, int mem2> struct _ucl_memcpy {
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const p2 &src, const size_t n,
-                        CUstream &cq, const bool block=false) {
-    CU_SAFE_CALL(cuMemcpyDtoDAsync(dst.cbegin(),src.cbegin(),n,cq));
-    if (block) ucl_sync(cq);
+  static inline void mc(p1 &dst, const p2 &src, const size_t n) {
+    CU_SAFE_CALL(cuMemcpyDtoD(dst.cbegin(),src.cbegin(),n));
   }
   template <class p1, class p2>
-  static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
-                        const size_t spitch, const size_t cols,
-                        const size_t rows, CUstream &cq,
-                        const bool block=false) {
+  static inline void mc(p1 &dst, const p2 &src, const size_t n,
+                        CUstream &cq) {
+    CU_SAFE_CALL(cuMemcpyDtoDAsync(dst.cbegin(),src.cbegin(),n,cq));
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows) {
+    if (p1::PADDED==0 || p2::PADDED==0) {
+      size_t src_offset=0, dst_offset=0;
+      for (size_t i=0; i<rows; i++) {                       
+        CU_SAFE_CALL(cuMemcpyDtoD(dst.cbegin()+dst_offset,
+                                  src.cbegin()+src_offset,cols));
+        src_offset+=spitch;
+        dst_offset+=dpitch;
+      }
+    } else {                                       
+      CUDA_MEMCPY2D ins;
+      _nvd_set_2D_loc(ins,dpitch,spitch,cols,rows);
+      ins.dstMemoryType=_nvd_set_2D_mem<p1::MEM_TYPE>::a();
+      ins.srcMemoryType=_nvd_set_2D_mem<p2::MEM_TYPE>::a();
+      ins.dstDevice=dst.cbegin();
+      ins.srcDevice=src.cbegin();
+      CU_SAFE_CALL(cuMemcpy2D(&ins));
+    }
+  }
+  template <class p1, class p2>
+      static inline void mc(p1 &dst, const size_t dpitch, const p2 &src, 
+                            const size_t spitch, const size_t cols,
+                            const size_t rows, CUstream &cq) {
     if (p1::PADDED==0 || p2::PADDED==0) {
       size_t src_offset=0, dst_offset=0;
       for (size_t i=0; i<rows; i++) {                       
@@ -447,13 +580,12 @@ template <int mem1, int mem2> struct _ucl_memcpy {
       ins.srcDevice=src.cbegin();
       CU_SAFE_CALL(cuMemcpy2DAsync(&ins,cq));
     }
-    if (block) ucl_sync(cq);
   }
 };
 
 template<class mat1, class mat2>
 inline void ucl_mv_cpy(mat1 &dst, const mat2 &src, const size_t n) {
-  _ucl_memcpy<mat1::MEM_TYPE,mat2::MEM_TYPE>::mc(dst,src,n,dst.cq(),true);
+  _ucl_memcpy<mat1::MEM_TYPE,mat2::MEM_TYPE>::mc(dst,src,n);
 }
 
 template<class mat1, class mat2>
@@ -467,7 +599,7 @@ inline void ucl_mv_cpy(mat1 &dst, const size_t dpitch, const mat2 &src,
                        const size_t spitch, const size_t cols, 
                        const size_t rows) {
   _ucl_memcpy<mat1::MEM_TYPE,mat2::MEM_TYPE>::mc(dst,dpitch,src,spitch,cols,
-                                                 rows,dst.cq(),true);
+                                                 rows);
 }
 
 template<class mat1, class mat2>
