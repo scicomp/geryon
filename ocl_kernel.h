@@ -78,10 +78,10 @@ class UCL_Program {
   }
   
   /// Load a program from a string and compile with flags
-  inline int load_string(const char *program, const char *flags="",
+  inline int load_string(const void *program, const char *flags="",
                          std::string *log=NULL) {
     cl_int error_flag;
-    const char *prog=program;
+    const char *prog=(const char *)program;
     _program=clCreateProgramWithSource(_context,1,&prog,NULL,&error_flag);
     CL_CHECK_ERR(error_flag);
     error_flag = clBuildProgram(_program,1,&_device,flags,NULL,NULL);
@@ -172,6 +172,8 @@ class UCL_Kernel {
   }
 
   /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue is used for the kernel execution **/
   inline void set_size(const size_t num_blocks, const size_t block_size) { 
     _dimensions=1; 
     _num_blocks[0]=num_blocks*block_size; 
@@ -179,6 +181,15 @@ class UCL_Kernel {
   }
 
   /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue for the kernel is changed to cq **/
+  inline void set_size(const size_t num_blocks, const size_t block_size,
+                       command_queue &cq)
+    { _cq=cq; set_size(num_blocks,block_size); }
+
+  /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue is used for the kernel execution **/
   inline void set_size(const size_t num_blocks_x, const size_t num_blocks_y,
                        const size_t block_size_x, const size_t block_size_y) { 
     _dimensions=2; 
@@ -189,6 +200,16 @@ class UCL_Kernel {
   }
   
   /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue for the kernel is changed to cq **/
+  inline void set_size(const size_t num_blocks_x, const size_t num_blocks_y,
+                       const size_t block_size_x, const size_t block_size_y,
+                       command_queue &cq) 
+    {_cq=cq; set_size(num_blocks_x, num_blocks_y, block_size_x, block_size_y);}
+
+  /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue is used for the kernel execution **/
   inline void set_size(const size_t num_blocks_x, const size_t num_blocks_y,
                        const size_t block_size_x, 
                        const size_t block_size_y, const size_t block_size_z) {
@@ -202,14 +223,20 @@ class UCL_Kernel {
     _block_size[2]=block_size_z; 
   }
 
-  /// Run the kernel in the default command queue
-  inline void run() {
-    run(_cq);
+  /// Set the number of thread blocks and the number of threads in each block
+  /** \note This should be called before any arguments have been added
+      \note The default command queue is used for the kernel execution **/
+  inline void set_size(const size_t num_blocks_x, const size_t num_blocks_y,
+                       const size_t block_size_x, const size_t block_size_y,
+                       const size_t block_size_z, command_queue &cq) {
+    _cq=cq;
+    set_size(num_blocks_x, num_blocks_y, block_size_x, block_size_y, 
+             block_size_z);
   }
   
-  /// Run the kernel in the specified command queue
-  inline void run(command_queue &cq) {
-    CL_SAFE_CALL(clEnqueueNDRangeKernel(cq,_kernel,_dimensions,NULL,
+  /// Run the kernel in the default command queue
+  inline void run() {
+    CL_SAFE_CALL(clEnqueueNDRangeKernel(_cq,_kernel,_dimensions,NULL,
                                         _num_blocks,_block_size,0,NULL,NULL));
   }
   

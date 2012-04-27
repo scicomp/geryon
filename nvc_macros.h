@@ -39,6 +39,19 @@
 
 #ifdef UCL_SYNC_DEBUG
 
+#if CUDART_VERSION >= 4000
+
+#define CUDA_SAFE_CALL( call) do {                                           \
+    CUDA_SAFE_CALL_NS( call);                                                \
+    cudaError err=cudaDeviceSynchronize();                                   \
+    if( cudaSuccess != err) {                                                \
+        fprintf(stderr, "Cuda error in file '%s' in line %i : %s.\n",        \
+                __FILE__, __LINE__, cudaGetErrorString( err) );              \
+        NVC_GERYON_EXIT;                                                     \
+    } } while (0)
+
+#else                                                                   
+
 #define CUDA_SAFE_CALL( call) do {                                           \
     CUDA_SAFE_CALL_NS( call);                                                \
     cudaError err=cudaThreadSynchronize();                                   \
@@ -47,6 +60,8 @@
                 __FILE__, __LINE__, cudaGetErrorString( err) );              \
         NVC_GERYON_EXIT;                                                     \
     } } while (0)
+
+#endif                                                                   \
 
 #else
 

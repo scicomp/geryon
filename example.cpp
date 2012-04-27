@@ -39,6 +39,15 @@ using namespace ucl_cudadr;
 using namespace ucl_opencl;
 #endif
 
+#ifdef USE_CUDA_RUNTIME
+#include "nvc_device.h"
+#include "nvc_timer.h"
+#include "nvc_mat.h"
+#include "nvc_kernel.h"
+#define KERNEL_NAME "example_kernel"
+using namespace ucl_cudart;
+#endif
+
 using namespace std;
 
 int main() {  
@@ -66,12 +75,11 @@ int main() {
   
   // Set up 1-dimensional kernel grid to add 6 elements and run on device
   timer_kernel.start();
-  k_vec_add.add_args(&dev_a.begin(),&dev_b.begin(),&answer.begin());
   size_t num_blocks=6, block_size=1;
-  k_vec_add.set_size(num_blocks,block_size);
-
   // Enqueue the kernel in the default command queue
-  k_vec_add.run();
+  k_vec_add.set_size(num_blocks,block_size);
+  k_vec_add.run(&dev_a.begin(),&dev_b.begin(),&answer.begin());
+
   timer_kernel.stop();
   cout << "Answer: " << answer << endl 
        << "Input copy time: " << timer_com.seconds() << endl 

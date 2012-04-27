@@ -215,7 +215,11 @@ inline int UCL_Device::set(int num) {
     return UCL_SUCCESS;
   for (int i=1; i<num_queues(); i++) pop_command_queue();
   _cq[0]=0;
+  #if CUDART_VERSION >= 4000
+  cudaDeviceReset();
+  #else
   cudaThreadExit();
+  #endif
   cudaError err=cudaSetDevice(_device_ids[num]);
   if (err!=cudaSuccess) {
     #ifndef UCL_NO_EXIT

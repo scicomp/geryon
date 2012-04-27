@@ -58,7 +58,8 @@ OCL_H  = $(wildcard ocl*.h) $(UCL_H)
 EXECS = $(BIN_DIR)/nvc_get_devices $(BIN_DIR)/ocl_get_devices \
         $(BIN_DIR)/nvd_get_devices
 
-EXAMPLES = $(BIN_DIR)/ucl_example_cdr $(BIN_DIR)/ucl_example_ocl
+EXAMPLES = $(BIN_DIR)/ucl_example_cdr $(BIN_DIR)/ucl_example_ocl \
+           $(BIN_DIR)/ucl_example_crt
 
 DEVICE_BIN = $(OBJ_DIR)/ucl_test_kernel.cubin $(OBJ_DIR)/ucl_test_kernel.ptx \
              $(OBJ_DIR)/ucl_test_kernel_d.ptx
@@ -74,6 +75,9 @@ $(BIN_DIR)/ocl_get_devices: ucl_get_devices.cpp
 $(BIN_DIR)/nvd_get_devices: ucl_get_devices.cpp $(NVD_H)
 	$(NVC) -o $@ ucl_get_devices.cpp -DUCL_CUDADR $(NVC_LINK) 
 
+$(OBJ_DIR)/ucl_test_kernel.o: ucl_test_kernel.cu
+	$(CUDA) -DNV_KERNEL -DOrdinal=int -DScalar=float -c -o $@ ucl_test_kernel.cu 
+
 $(OBJ_DIR)/ucl_test_kernel.cubin: ucl_test_kernel.cu
 	$(CUDA) -DNV_KERNEL -DOrdinal=int -DScalar=float -cubin -o $@ ucl_test_kernel.cu 
 
@@ -83,17 +87,23 @@ $(OBJ_DIR)/ucl_test_kernel.ptx: ucl_test_kernel.cu
 $(OBJ_DIR)/ucl_test_kernel_d.ptx: ucl_test_kernel.cu
 	$(CUDA) -DNV_KERNEL -DOrdinal=int -DScalar=double -ptx -o $@ ucl_test_kernel.cu 
 
-$(BIN_DIR)/ucl_test: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
-	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ ucl_test.cpp $(OCL_LINK) $(NVC_LINK)
+$(BIN_DIR)/ucl_test: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin $(OBJ_DIR)/ucl_test_kernel.o
+	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ ucl_test.cpp $(OBJ_DIR)/ucl_test_kernel.o $(OCL_LINK) $(NVC_LINK)
 
-$(BIN_DIR)/ucl_test_debug: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin
-	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ -DUCL_DEBUG -DUCL_NO_EXIT -g ucl_test.cpp $(OCL_LINK) $(NVC_LINK)
+$(BIN_DIR)/ucl_test_debug: ucl_test.cpp ucl_test_source.h $(NVC_H) $(OCL_H) $(NVD_H) $(OBJ_DIR)/ucl_test_kernel.cubin $(OBJ_DIR)/ucl_test_kernel.o
+	$(CPP) $(OCL_CPP) $(NVC_CPP) -o $@ -DUCL_DEBUG -DUCL_NO_EXIT -g ucl_test.cpp $(OBJ_DIR)/ucl_test_kernel.o $(OCL_LINK) $(NVC_LINK)
 
-$(BIN_DIR)/ucl_example_ocl: example.cpp $(NVD_H) $(OCL_H)
+$(BIN_DIR)/ucl_example_ocl: example.cpp $(OCL_H)
 	$(OCL) -o $@ example.cpp -DUSE_OPENCL $(OCL_LINK) 
 
-$(BIN_DIR)/ucl_example_cdr: example.cpp $(NVD_H) $(OCL_H)
+$(BIN_DIR)/ucl_example_cdr: example.cpp $(NVD_H)
 	$(NVC) -o $@ example.cpp -DUSE_CUDA_DRIVER $(NVC_LINK) 
+
+$(OBJ_DIR)/example_kernel.o: ucl_test_kernel.cu example_kernel.cu
+	$(CUDA) -DNV_KERNEL -DOrdinal=int -DScalar=float -c -o $@ example_kernel.cu 
+
+$(BIN_DIR)/ucl_example_crt: example.cpp $(NVC_H) $(OBJ_DIR)/example_kernel.o
+	$(NVC) -DUSE_CUDA_RUNTIME -o $@ example.cpp $(OBJ_DIR)/example_kernel.o $(NVC_LINK)
 
 test: $(BIN_DIR)/ucl_test $(DEVICE_BIN) $(EXAMPLES)
 	ucl_test $(OBJ_DIR); 

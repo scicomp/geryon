@@ -53,9 +53,8 @@
 
   timer_kernel.start();
   cerr << "  Setting kernel arguments...";
-  k_vec_add.add_args(&cop_a.begin(),&cop_b.begin(),
-                     &answer.begin());
   k_vec_add.set_size(2,3);
+  k_vec_add.add_args(&cop_a.begin(),&cop_b.begin(),&answer.begin());
   cerr << "Done.\n";
   cerr << "  Running kernel...";
   k_vec_add.run();
@@ -71,6 +70,9 @@
   timer_kernel.start();
   answer.zero();
   cerr << "  Running kernel with run...";
+  k_vec_add.clear_args();
+  k_vec_add.set_size(2,3);
+  k_vec_add.add_args(&cop_a.begin(),&cop_b.begin(),&answer.begin());
   k_vec_add.run(&cop_a.begin(),&cop_b.begin(),
                 &answer.begin());
   cerr << "Done.\n";
@@ -82,11 +84,11 @@
   assert(out2.str()=="0 3 6 9 12 15");
   cerr << "Done.\n";
     
+  k_vec_add.set_size(2,3,cop.cq());
   timer_kernel.start();
   answer.zero();
   cerr << "  Running kernel with run_cq...";
-  k_vec_add.run_cq(cop.cq(),&cop_a.begin(),&cop_b.begin(),
-                   &answer.begin());
+  k_vec_add.run(&cop_a.begin(),&cop_b.begin(),&answer.begin());
   cerr << "Done.\n";
   timer_kernel.stop();
   

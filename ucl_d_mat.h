@@ -357,9 +357,9 @@ class UCL_D_Mat : public UCL_BaseMat {
   inline const device_ptr & begin() const { return _array; }
   #else
   /// For CUDA-RT, get device pointer to first element
-  inline numtyp * begin() { return _array; }
+  inline numtyp * & begin() { return _array; }
   /// For CUDA-RT, get device pointer to first element
-  inline const numtyp * begin() const { return _array; }
+  inline numtyp * const & begin() const { return _array; }
   /// For CUDA-RT, get device pointer to one past last element
   inline numtyp * end() { return _end; }
   /// For CUDA-RT, get device pointer to one past last element

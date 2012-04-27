@@ -30,6 +30,9 @@
 #include "nvc_timer.h"
 #include "nvd_timer.h"
 #include "ocl_timer.h"
+#if CUDART_VERSION >= 4000
+#include "nvc_kernel.h"
+#endif
 #include "nvd_kernel.h"
 #include "ocl_kernel.h"
 #include "nvc_texture.h"
@@ -136,7 +139,16 @@ void cudadr_test(const bool async, const string cubin_dir) {
 template <class numtyp>
 void cudart_test(const bool async) {
   using namespace ucl_cudart;
+  #if CUDART_VERSION >= 4000
   #include "ucl_test_source.h"
+  string kernel_name="vec_add";
+  const char *kernel_string="vec_add";
+  if (sizeof(numtyp)!=8) {
+    #include "ucl_test_vecadd.h"
+  }
+  #else
+  cerr << "NOT TESTING CUDA RUNTIME KERNEL VEC ADD.\n";
+  #endif
   cerr << "DONE.\n";
 }
 
