@@ -37,6 +37,11 @@ class UCL_Texture {
   inline UCL_Texture(textureReference *t) { get_texture(t); }
   /// Set the texture reference for this object
   inline void get_texture(textureReference *t) { _tex_ptr=t; }
+  /// Set the texture reference for this object
+  inline void get_texture(UCL_Program &prog, const char *texture_name) {
+    CUDA_SAFE_CALL(cudaGetTextureReference((const textureReference **)&_tex_ptr,  
+                                           texture_name));
+  }
 
   /// Bind a float array where each fetch grabs a vector of length numel
   template<class mat_typ>

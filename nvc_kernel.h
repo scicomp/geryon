@@ -82,7 +82,6 @@ class UCL_Kernel {
     _param_size=0;
     _num_blocks.x=0; 
     set_function(program,function); 
-    _cq=program._cq; 
   }
   
   ~UCL_Kernel() {}
