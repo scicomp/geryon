@@ -107,7 +107,14 @@ class UCL_Vector {
   inline size_t rows() const { return host.rows(); }
   /// Get the number of columns
   inline size_t cols() const { return host.cols(); }
-    
+  /// Get the memory usage (bytes) of the s-object (including any buffers)
+  inline size_t host_mem_usage() 
+    { return host.row_bytes()+_buffer.row_bytes(); }
+  /// Get the memory usage (bytes) of the s-object (including any buffers)
+  inline size_t device_mem_usage() 
+    { return device.row_bytes(); }
+  
+  
   /// Get element at index i
   inline hosttype & operator[](const int i) { return host[i]; }
   /// Get element at index i
