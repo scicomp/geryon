@@ -1284,9 +1284,379 @@
     view1.view(tview);
     cerr << "Done.\n";
     }
-        
+
     cerr << "  Destructing..."; 
   }
+  cerr << "Done.\n";
+
+  // -------------------------------------------------------------------------
+  // - S-OBJECT VECTOR TESTS
+  // -------------------------------------------------------------------------
+  cerr << "S-Object (6) vector tests.\n";
+  {
+    cerr << "  Constructor allocation...";
+    UCL_Vector<numtyp,numtyp> mat(6,cop);
+    cerr << "Done.\n";
+    cerr << "  Clearing...";
+    mat.clear();
+    cerr << "Done.\n";
+    cerr << "  Member allocation...";
+    mat.alloc(6,cop);
+    cerr << "Done.\n";
+    cerr << "  Zeroing...";
+    mat.zero();
+    cerr << "Done.\n";
+    cerr << "  Member tests...";
+    assert(mat.numel()==6 && mat.rows()==1 && mat.cols()==6);
+    assert(mat.row_size()==6 && mat.row_bytes()==6*sizeof(numtyp));
+    cerr << "Done.\n";
+    cerr << "  Allocation with mat instead of device...";
+    UCL_Vector<numtyp,numtyp> mat2;
+    mat2.alloc(6,mat.device);
+    cerr << "Done.\n";
+    cerr << "  Destructing..."; 
+  }
+  cerr << "Done.\n";
+  {    
+    UCL_Vector<float,numtyp> mat(6,cop,UCL_RW_OPTIMIZED,UCL_READ_WRITE);
+    mat.zero();
+    count_6_single.zero();
+    cerr << "  Copy 3 of single precision vector into...";
+    ucl_copy(mat.host,count_vec_single,async);
+    mat.update_device(3,async);
+    ucl_copy(count_6_single,mat.device,async);
+    count_6_single.sync();
+    for (int i=0; i<3; i++) assert(count_6_single[i]==static_cast<float>(i));
+    for (int i=3; i<6; i++) assert(count_6_single[i]==static_cast<float>(0));
+    mat.host.zero();
+    mat.update_host(3,async);
+    mat.sync();
+    for (int i=0; i<3; i++) assert(mat[i]==static_cast<float>(i));
+    for (int i=3; i<6; i++) assert(mat[i]==static_cast<float>(0));
+    cerr << "Done.\n";
+    cerr << "  Copy single precision vector into...";
+    ucl_copy(mat.host,count_vec_single,async);
+    mat.update_device(async);
+    ucl_copy(count_6_single,mat.device,async);
+    count_6_single.sync();
+    for (int i=0; i<6; i++) assert(count_6_single[i]==static_cast<float>(i));
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<float>(i));
+    cerr << "Done.\n";
+    cerr << "  Zero test...";
+    mat.zero();
+    ucl_copy(count_6_single,mat.device,async);
+    count_6_single.sync();
+    for (int i=0; i<6; i++) assert(count_6_single[i]==static_cast<float>(0));       
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<float>(0));       
+    cerr << "Done.\n";
+    cerr << "  Destructing..."; 
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Vector<double,numtyp> mat(6,cop,UCL_RW_OPTIMIZED,UCL_READ_ONLY);
+    count_6_double.zero();
+    cerr << "  Copy 3 of double precision vector into...";
+    ucl_copy(mat.host,count_vec_double,async);
+    mat.update_device(3,async);
+    ucl_copy(count_6_double,mat.device,async);
+    count_6_double.sync();
+    for (int i=0; i<3; i++) assert(count_6_double[i]==static_cast<double>(i));
+    for (int i=3; i<6; i++) assert(count_6_double[i]==static_cast<double>(0));
+    mat.host.zero();
+    mat.update_host(3,async);
+    mat.sync();
+    for (int i=0; i<3; i++) assert(mat[i]==static_cast<double>(i));
+    for (int i=3; i<6; i++) assert(mat[i]==static_cast<double>(0));
+    cerr << "Done.\n";
+    cerr << "  Copy double precision vector into...";
+    ucl_copy(mat.host,count_vec_double,async);
+    mat.update_device(async);
+    ucl_copy(count_6_double,mat.device,async);
+    count_6_double.sync();
+    for (int i=0; i<6; i++) assert(count_6_double[i]==static_cast<double>(i));
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<double>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing..."; 
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Vector<int,numtyp> mat(6,cop);
+    mat.zero();
+    count_6_int.zero();
+    cerr << "  Copy 3 of int vector into...";
+    ucl_copy(mat.host,count_vec_int,async);
+    mat.update_device(3,async);
+    ucl_copy(count_6_int,mat.device,async);
+    count_6_int.sync();
+    for (int i=0; i<3; i++) assert(count_6_int[i]==static_cast<float>(i));
+    for (int i=3; i<6; i++) assert(count_6_int[i]==static_cast<float>(0));
+    mat.host.zero();
+    mat.update_host(3,async);
+    mat.sync();
+    for (int i=0; i<3; i++) assert(mat[i]==static_cast<float>(i));
+    for (int i=3; i<6; i++) assert(mat[i]==static_cast<float>(0));
+    cerr << "Done.\n";
+    cerr << "  Copy int vector into...";
+    ucl_copy(mat.host,count_vec_int,async);
+    mat.update_device(async);
+    ucl_copy(count_6_int,mat.device,async);
+    count_6_int.sync();
+    for (int i=0; i<6; i++) assert(count_6_int[i]==static_cast<int>(i));
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<int>(i));
+    cerr << "Done.\n";
+
+    cerr << "  Print test...";
+    ostringstream out1,out2,out3,out4,out5;
+    ucl_print(mat,out1);
+    assert(out1.str()=="0 1 2 3 4 5");
+    cerr << "Done.\n";
+    cerr << "  Print as mat test...";
+    ucl_print(mat,2,2,out2);
+    assert(out2.str()=="0 1\n2 3");
+    cerr << "Done.\n";
+    cerr << "  Print 4 test...";
+    ucl_print(mat,4,out3);
+    assert(out3.str()=="0 1 2 3");
+    cerr << "Done.\n";
+
+    cerr << "  Print with device test...";
+    ucl_print(mat,out4,cop);
+    assert(out4.str()=="0 1 2 3 4 5");
+    cerr << "Done.\n";
+    cerr << "  Operator << test...";
+    out5 << mat;
+    assert(out5.str()=="0 1 2 3 4 5");
+    cerr << "Done.\n";
+        
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+
+  // -------------------------------------------------------------------------
+  // - S-Object MATRIX TESTS
+  // -------------------------------------------------------------------------
+  cerr << "S-object (2,3) tests.\n";
+  {
+    cerr << "  Constructor allocation...";
+    UCL_Matrix<numtyp,numtyp> mat(2,3,cop);
+    cerr << "Done.\n";
+    cerr << "  Clearing...";
+    mat.clear();
+    cerr << "Done.\n";
+    cerr << "  Member allocation...";
+    mat.alloc(2,3,cop);
+    cerr << "Done.\n";
+    cerr << "  Zeroing...";
+    mat.zero();
+    cerr << "Done.\n";
+    cerr << "  Member tests...";
+    assert(mat.numel()==6 && mat.rows()==2 && mat.cols()==3);
+    cerr << "Done.\n";
+    cerr << "  Allocation with mat instead of device...";
+    UCL_Matrix<numtyp,numtyp> mat2;
+    mat.clear();
+    mat2.alloc(2,3,cop);
+    mat.alloc(2,3,cop);
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<float,numtyp> mat(2,3,cop);
+    count_23_single.zero();
+    mat.zero();
+    cerr << "  Copy single precision vector into...";
+    ucl_copy(mat.host,count_vec_single,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<double,numtyp> mat(2,3,cop);
+    count_23_single.zero();
+    mat.zero();
+    cerr << "  Copy double precision vector into...";
+    ucl_copy(mat.host,count_vec_double,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<int,numtyp> mat(2,3,cop);
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy int vector into...";
+    ucl_copy(mat.host,count_vec_int,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<float,numtyp> mat(2,3,cop,UCL_RW_OPTIMIZED,UCL_READ_WRITE);    
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy single precision matrix into...";
+    ucl_copy(mat.host,count_mat_single,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<double,numtyp> mat(2,3,cop,UCL_RW_OPTIMIZED,UCL_READ_WRITE);    
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy double precision matrix into...";
+    ucl_copy(mat.host,count_mat_double,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<int,numtyp> mat(2,3,cop,UCL_RW_OPTIMIZED,UCL_READ_ONLY);
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy int matrix into...";
+    ucl_copy(mat.host,count_mat_int,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<float,numtyp> mat(2,3,cop);
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy single precision vector into slice...";
+    ucl_copy(mat.host,count_vec4_single,2,2,async);
+    mat.update_device(2,2,async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<2; i++) assert(count_23_single(0,i)==
+                                   static_cast<numtyp>(i));
+    for (int i=0; i<2; i++) assert(count_23_single(1,i)==
+                                   static_cast<numtyp>(i+2));
+    mat.host.zero();
+    mat.update_host(2,2,async);
+    mat.sync();
+    for (int i=0; i<2; i++) assert(count_23_single(0,i)==
+                                   static_cast<numtyp>(i));
+    for (int i=0; i<2; i++) assert(count_23_single(1,i)==
+                                   static_cast<numtyp>(i+2));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<double,numtyp> mat(2,3,cop);
+    mat.zero();
+    count_23_single.zero();
+    cerr << "  Copy double precision vector into slice...";
+    ucl_copy(mat.host,count_vec4_double,2,2,async);
+    mat.update_device(2,2,async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<2; i++) assert(count_23_single(0,i)==
+                                   static_cast<numtyp>(i));
+    for (int i=0; i<2; i++) assert(count_23_single(1,i)==
+                                   static_cast<numtyp>(i+2));
+    mat.host.zero();
+    mat.update_host(2,2,async);
+    mat.sync();
+    for (int i=0; i<2; i++) assert(count_23_single(0,i)==
+                                   static_cast<numtyp>(i));
+    for (int i=0; i<2; i++) assert(count_23_single(1,i)==
+                                   static_cast<numtyp>(i+2));
+    cerr << "Done.\n";
+    
+    mat.zero();
+    cerr << "  Copy from another device vector...";
+    ucl_copy(mat.device,count_mat_double,async);
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<float>(i));
+    cerr << "Done.\n";
+    
+    //cerr << "Copy into 
+  
+    cerr << "  Print test...";
+    ostringstream out1,out2,out3,out4,out5;
+    ucl_print(mat,out1);
+    assert(out1.str()=="0 1 2\n3 4 5");
+    cerr << "Done.\n";
+    cerr << "  Print slice test...";
+    ucl_print(mat,2,2,out2);
+    assert(out2.str()=="0 1\n3 4");
+    cerr << "Done.\n";
+    cerr << "  Print vector slice test...";
+    ucl_print(mat,3,out3);
+    assert(out3.str()=="0 1 2");
+    cerr << "Done.\n";
+    
+    cerr << "  Print with device test...";
+    ucl_print(mat,out4,cop);
+    assert(out1.str()=="0 1 2\n3 4 5");
+    cerr << "Done.\n";
+    cerr << "  Operator << test...";
+    out5 << mat;
+    assert(out1.str()=="0 1 2\n3 4 5");
+    cerr << "Done.\n";
+
+    cerr << "  Destructing..."; 
+  }
+
   cerr << "Done.\n";
   cerr << "Stopping device timer...";
   timer.stop();
