@@ -95,6 +95,21 @@ class UCL_Matrix {
   inline void clear() 
     { host.clear(); device.clear(); }
 
+  /// Resize the allocation to contain cols elements
+  inline int resize(const int rows, const int cols) {
+    assert(host.kind()!=UCL_VIEW);
+    int err=host.resize(rows,cols);
+    if (err!=UCL_SUCCESS)
+      return err;
+    return _ucl_s_obj_help< ucl_same_type<hosttype,devtype>::ans >::
+      dev_resize(device,host,_buffer,rows,cols);
+  }
+    
+  /// Resize (only if bigger) the allocation to contain cols elements
+  inline int resize_ib(const int new_rows, const int new_cols)
+    { if (new_rows>rows() || new_cols>cols()) return resize(new_rows,new_cols); 
+      else return UCL_SUCCESS; }
+
   /// Set each element to zero
   inline void zero() { host.zero(); device.zero(); }
   

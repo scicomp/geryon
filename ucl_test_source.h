@@ -1384,6 +1384,23 @@
   }
   cerr << "Done.\n";
   {
+    UCL_Vector<double,numtyp> mat(3,cop,UCL_RW_OPTIMIZED,UCL_READ_ONLY);
+    count_6_double.zero();
+    cerr << "  Resize vector test...";
+    mat.resize(6);
+    ucl_copy(mat.host,count_vec_double,async);
+    mat.update_device(async);
+    ucl_copy(count_6_double,mat.device,async);
+    count_6_double.sync();
+    for (int i=0; i<6; i++) assert(count_6_double[i]==static_cast<double>(i));
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(mat[i]==static_cast<double>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing..."; 
+  }
+  cerr << "Done.\n";
+  {
     UCL_Vector<int,numtyp> mat(6,cop);
     mat.zero();
     count_6_int.zero();
@@ -1544,6 +1561,25 @@
     mat.zero();
     count_23_single.zero();
     cerr << "  Copy double precision matrix into...";
+    ucl_copy(mat.host,count_mat_double,async);
+    mat.update_device(async);
+    ucl_copy(count_23_single,mat.device,async);
+    count_23_single.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    mat.host.zero();
+    mat.update_host(async);
+    mat.sync();
+    for (int i=0; i<6; i++) assert(count_23_single[i]==static_cast<numtyp>(i));
+    cerr << "Done.\n";
+    cerr << "  Destructing...";
+  }
+  cerr << "Done.\n";
+  {
+    UCL_Matrix<double,numtyp> mat(1,2,cop,UCL_RW_OPTIMIZED,UCL_READ_WRITE);
+    cerr << "  Resize matrix test...";
+    mat.resize(2,3);
+    mat.zero();
+    count_23_single.zero();
     ucl_copy(mat.host,count_mat_double,async);
     mat.update_device(async);
     ucl_copy(count_23_single,mat.device,async);

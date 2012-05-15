@@ -115,7 +115,25 @@ template <> struct _ucl_s_obj_help<1> {
                           t3 &buffer, command_queue &cq) {
     ucl_copy(dst,src,rows,cols,cq);
   }
+  
+  template <class t1, class t2, class t3>
+  static inline int dev_resize(t1 &device, t2 &host, t3 &buff,const int cols) {
+    if (device.kind()==UCL_VIEW) {
+      device.view(host);
+      return UCL_SUCCESS;
+    } else
+      return device.resize(cols);
+  }
 
+  template <class t1, class t2, class t3>
+  static inline int dev_resize(t1 &device, t2 &host, t3 &buff, const int rows, 
+                               const int cols) {
+    if (device.kind()==UCL_VIEW) {
+      device.view(host);
+      return UCL_SUCCESS;
+    } else
+      return device.resize(rows,cols);
+  }
 };
 
 // Host and device containers are different types
@@ -212,6 +230,23 @@ template <int st> struct _ucl_s_obj_help {
   static inline void copy(t1 &dst, t2 &src, const int rows, const int cols, 
                           t3 &buffer, command_queue &cq) {
     ucl_cast_copy(dst,src,rows,cols,buffer,cq);
+  }
+
+  template <class t1, class t2, class t3>
+  static inline int dev_resize(t1 &device, t2 &host, t3 &buff,const int cols) {
+    int err=buff.resize(cols);
+    if (err!=UCL_SUCCESS)
+      return err;
+    return device.resize(cols);
+  }
+
+  template <class t1, class t2, class t3>
+  static inline int dev_resize(t1 &device, t2 &host, t3 &buff, const int rows, 
+                               const int cols) {
+    int err=buff.resize(rows,cols);
+    if (err!=UCL_SUCCESS)
+      return err;
+    return device.resize(rows,cols);
   }
 
 };
