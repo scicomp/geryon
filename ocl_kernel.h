@@ -159,17 +159,57 @@ class UCL_Kernel {
   /** If not a device pointer, this must be repeated each time the argument
     * changes **/
   template <class dtype>
-  inline void set_arg(const cl_uint index, dtype *arg) { 
+  inline void set_arg(const cl_uint index, const dtype * const arg) { 
     CL_SAFE_CALL(clSetKernelArg(_kernel,index,sizeof(dtype),arg)); 
     if (index>_num_args) _num_args=index;
   }
  
+  /// Set a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void set_arg(const UCL_D_Vec<numtyp> * const arg) 
+    { set_arg(&arg->begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void set_arg(const UCL_D_Mat<numtyp> * const arg) 
+    { set_arg(&arg->begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void set_arg(const UCL_Vector<hosttype, devtype> * const arg) 
+    { set_arg(&arg->device.begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void set_arg(const UCL_Matrix<hosttype, devtype> * const arg) 
+    { set_arg(&arg->device.begin()); }
+
   /// Add a kernel argument.
   template <class dtype>
-  inline void add_arg(dtype *arg) {
+  inline void add_arg(const dtype * const arg) {
     CL_SAFE_CALL(clSetKernelArg(_kernel,_num_args,sizeof(dtype),arg)); 
     _num_args++; 
   }
+
+  /// Add a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void add_arg(const UCL_D_Vec<numtyp> * const arg) 
+    { add_arg(&arg->begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void add_arg(const UCL_D_Mat<numtyp> * const arg) 
+    { add_arg(&arg->begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void add_arg(const UCL_Vector<hosttype, devtype> * const arg) 
+    { add_arg(&arg->device.begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void add_arg(const UCL_Matrix<hosttype, devtype> * const arg) 
+    { add_arg(&arg->device.begin()); }
 
   /// Set the number of thread blocks and the number of threads in each block
   /** \note This should be called before any arguments have been added

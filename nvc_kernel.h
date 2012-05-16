@@ -99,7 +99,7 @@ class UCL_Kernel {
     * changes 
     * \note To set kernel parameter i (i>0), parameter i-1 must be set **/
   template <class dtype>
-  inline void set_arg(const unsigned index, dtype *arg) {
+  inline void set_arg(const unsigned index, const dtype * const arg) {
     if (index==_num_args)
       add_arg(arg);
     else if (index<_num_args)
@@ -108,21 +108,30 @@ class UCL_Kernel {
     else
       assert(0==1); // Must add kernel parameters in sequential order 
   }
-/* 
-  /// Add a kernel argument.
-  inline void add_arg(const CUdeviceptr* const arg) {
-    void* ptr = (void*)(size_t)(*arg);
-    _param_size = (_param_size + __alignof(ptr) - 1) & ~(__alignof(ptr) - 1);
-    CUDA_SAFE_CALL(cudaSetupArgument(&ptr,sizeof(ptr),_param_size));
-    _offsets.push_back(_param_size);
-    _param_size+=sizeof(ptr);
-    _num_args++;
-    if (_num_args>UCL_MAX_KERNEL_ARGS) assert(0==1);
-  }
-*/
+ 
+  /// Set a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void set_arg(const UCL_D_Vec<numtyp> * const arg) 
+    { set_arg(&arg->begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void set_arg(const UCL_D_Mat<numtyp> * const arg) 
+    { set_arg(&arg->begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void set_arg(const UCL_Vector<hosttype, devtype> * const arg) 
+    { set_arg(&arg->device.begin()); }
+
+  /// Set a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void set_arg(const UCL_Matrix<hosttype, devtype> * const arg) 
+    { set_arg(&arg->device.begin()); }
+
   /// Add a kernel argument.
   template <class dtype>
-  inline void add_arg(dtype* arg) {
+  inline void add_arg(const dtype* const arg) {
     _param_size = (_param_size+__alignof(dtype)-1) & ~(__alignof(dtype)-1);
     CUDA_SAFE_CALL(cudaSetupArgument((void*)arg,sizeof(dtype),_param_size));
     _offsets.push_back(_param_size);
@@ -130,6 +139,26 @@ class UCL_Kernel {
     _num_args++;
     if (_num_args>UCL_MAX_KERNEL_ARGS) assert(0==1);
   }
+
+  /// Add a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void add_arg(const UCL_D_Vec<numtyp> * const arg) 
+    { add_arg(&arg->begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class numtyp>
+  inline void add_arg(const UCL_D_Mat<numtyp> * const arg) 
+    { add_arg(&arg->begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void add_arg(const UCL_Vector<hosttype, devtype> * const arg) 
+    { add_arg(&arg->device.begin()); }
+
+  /// Add a geryon container as a kernel argument.
+  template <class hosttype, class devtype>
+  inline void add_arg(const UCL_Matrix<hosttype, devtype> * const arg) 
+    { add_arg(&arg->device.begin()); }
 
   /// Set the number of thread blocks and the number of threads in each block
   /** \note This should be called before any arguments have been added

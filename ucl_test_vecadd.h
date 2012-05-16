@@ -98,6 +98,20 @@
   assert(out3.str()=="0 3 6 9 12 15");
   cerr << "Done.\n";
     
+  k_vec_add.set_size(2,3,cop.cq());
+  timer_kernel.start();
+  answer.zero();
+  cerr << "  Running kernel with implicit begin...";
+  k_vec_add.run(&cop_a,&cop_b,&answer);
+  cerr << "Done.\n";
+  timer_kernel.stop();
+  
+  cerr << "  Checking answer...";
+  ostringstream out4;
+  out4 << answer;
+  assert(out4.str()=="0 3 6 9 12 15");
+  cerr << "Done.\n";
+    
   double timer_com_s=timer_com.seconds();
   double timer_kernel_s=timer_kernel.seconds(); 
   assert(timer_com_s>-1.0 && timer_kernel_s>-1.0);

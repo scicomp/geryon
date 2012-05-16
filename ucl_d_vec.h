@@ -392,7 +392,7 @@ class UCL_D_Vec : public UCL_BaseMat {
   /// For CUDA-RT, get device pointer to one past last element
   inline numtyp * end() { return _end; }
   /// For CUDA-RT, get device pointer to one past last element
-  inline const numtyp * end() const { return _end; }
+  inline numtyp * end() const { return _end; }
   #endif
   
   #ifdef _UCL_DEVICE_PTR_MAT
