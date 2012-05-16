@@ -17,6 +17,7 @@
 #endif
 
 #define Scalar float
+
 __kernel void vec_add(__global Scalar *a, __global Scalar *b, 
                       __global Scalar *ans) {
   int i=GLOBAL_ID_X;

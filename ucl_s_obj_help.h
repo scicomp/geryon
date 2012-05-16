@@ -150,7 +150,12 @@ template <int st> struct _ucl_s_obj_help {
     e1=_buffer.alloc(cols,acc,kind1);
     if (e1!=UCL_SUCCESS)
       return e1;
-    return device.alloc(cols,acc,kind2); 
+
+    if (acc.shared_memory()) {
+      device.view(_buffer);
+      return UCL_SUCCESS;
+    } else
+      return device.alloc(cols,acc,kind2);
   }
 
   template <class t1, class t2, class t3, class mat_type>
@@ -180,7 +185,12 @@ template <int st> struct _ucl_s_obj_help {
     e1=_buffer.alloc(rows,cols,acc,kind1);
     if (e1!=UCL_SUCCESS)
       return e1;
-    return device.alloc(rows,cols,acc,kind2); 
+
+    if (acc.shared_memory()) {
+      device.view(_buffer);
+      return UCL_SUCCESS;
+    } else
+      return device.alloc(rows,cols,acc,kind2);
   }
 
   template <class t1, class t2, class t3, class mat_type>
@@ -237,7 +247,12 @@ template <int st> struct _ucl_s_obj_help {
     int err=buff.resize(cols);
     if (err!=UCL_SUCCESS)
       return err;
-    return device.resize(cols);
+
+    if (device.kind()==UCL_VIEW) {
+      device.view(buff);
+      return UCL_SUCCESS;
+    } else
+      return device.resize(cols);
   }
 
   template <class t1, class t2, class t3>
@@ -246,7 +261,12 @@ template <int st> struct _ucl_s_obj_help {
     int err=buff.resize(rows,cols);
     if (err!=UCL_SUCCESS)
       return err;
-    return device.resize(rows,cols);
+
+    if (device.kind()==UCL_VIEW) {
+      device.view(buff);
+      return UCL_SUCCESS;
+    } else
+      return device.resize(rows,cols);
   }
 
 };
