@@ -34,6 +34,13 @@ class UCL_Program {
  public:
   inline UCL_Program() : _init_done(false) {}
   inline UCL_Program(UCL_Device &device) : _init_done(false) { init(device); }
+  inline UCL_Program(UCL_Device &device, const void *program, 
+                     const char *flags="", std::string *log=NULL) : 
+      _init_done(false) { 
+    init(device); 
+    load_string(program,flags,log);
+  }
+
   inline ~UCL_Program() { clear(); }
 
   /// Initialize the program with a device

@@ -34,6 +34,13 @@ class UCL_Texture;
 class UCL_Program {
  public:
   inline UCL_Program(UCL_Device &device) { _cq=device.cq(); }
+  inline UCL_Program(UCL_Device &device, const void *program, 
+                     const char *flags="", std::string *log=NULL) { 
+    _cq=device.cq();
+    init(device); 
+    load_string(program,flags,log);
+  }
+
   inline ~UCL_Program() {}
 
   /// Initialize the program with a device
