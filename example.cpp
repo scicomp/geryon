@@ -3,7 +3,7 @@
                              -------------------
                                W. Michael Brown
 
-  Vector add example
+  Vector add example (Host code)
 
  __________________________________________________________________________
     This file is part of the Geryon Unified Coprocessor Library (UCL)
@@ -20,71 +20,4 @@
    certain rights in this software.  This software is distributed under 
    the Simplified BSD License.
    ----------------------------------------------------------------------- */
-
-#ifdef USE_CUDA_DRIVER
-#include "nvd_device.h"
-#include "nvd_timer.h"
-#include "nvd_mat.h"
-#include "nvd_kernel.h"
-#define KERNEL_NAME "example_kernel.ptx"
-using namespace ucl_cudadr;
-#endif
-
-#ifdef USE_OPENCL
-#include "ocl_device.h"
-#include "ocl_mat.h"
-#include "ocl_timer.h"
-#include "ocl_kernel.h"
-#define KERNEL_NAME "example_kernel.cu"
-using namespace ucl_opencl;
-#endif
-
-#ifdef USE_CUDA_RUNTIME
-#include "nvc_device.h"
-#include "nvc_timer.h"
-#include "nvc_mat.h"
-#include "nvc_kernel.h"
-#define KERNEL_NAME "example_kernel"
-using namespace ucl_cudart;
-#endif
-
-using namespace std;
-
-int main() {  
-  // Set the active device and initialize timers
-  UCL_Device dev;  if (dev.num_devices()==0) UCL_GERYON_EXIT;  dev.set(0);
-  UCL_Timer timer_com(dev), timer_kernel(dev);
-  
-  // Load/compile the kernel
-  UCL_Program program(dev);
-  string flags="-cl-fast-relaxed-math -D Scalar=float";
-  program.load(KERNEL_NAME,flags.c_str());
-  UCL_Kernel k_vec_add(program,"vec_add");
-
-  // Allocate storage on host and device
-  UCL_H_Vec<double> a(6,dev,UCL_WRITE_OPTIMIZED), b(6,dev,UCL_WRITE_OPTIMIZED);
-  UCL_D_Vec<float> dev_a(6,dev,UCL_READ_ONLY), dev_b(6,dev,UCL_READ_ONLY);
-  UCL_D_Vec<float> answer(6,dev,UCL_WRITE_ONLY);
-  
-  // Get the data on the device
-  for (int i=0; i<6; i++) { a[i]=i; b[i]=i; }  
-  timer_com.start();
-  ucl_copy(dev_a,a,true);
-  ucl_copy(dev_b,b,true);
-  timer_com.stop();
-  
-  // Set up 1-dimensional kernel grid to add 6 elements and run on device
-  timer_kernel.start();
-  size_t num_blocks=6, block_size=1;
-  // Enqueue the kernel in the default command queue
-  k_vec_add.set_size(num_blocks,block_size);
-  k_vec_add.run(&dev_a.begin(),&dev_b.begin(),&answer.begin());
-
-  timer_kernel.stop();
-  cout << "Answer: " << answer << endl 
-       << "Input copy time: " << timer_com.seconds() << endl 
-       << "Kernel time: " << timer_kernel.seconds() << endl;   
-  
-  return 0;
-}
-
+#ifdef USE_CUDA_DRIVER#include "nvd_device.h"#include "nvd_timer.h"#include "nvd_mat.h"#include "nvd_kernel.h"#include "example_kernel.h"using namespace ucl_cudadr;#endif#ifdef USE_OPENCL#include "ocl_device.h"#include "ocl_mat.h"#include "ocl_timer.h"#include "ocl_kernel.h"#include "example_kernel.h"using namespace ucl_opencl;#endif#ifdef USE_CUDA_RUNTIME#include "nvc_device.h"#include "nvc_mat.h"#include "nvc_timer.h"#include "nvc_kernel.h"#define kernel_string NULLusing namespace ucl_cudart;#endifint main() {   // Set the active device  UCL_Device dev;   if (dev.num_devices()==0) exit(1);   dev.set(0);  // Initialize timers  UCL_Timer timer_com(dev), timer_kernel(dev);   // Load/compile the kernel  UCL_Program program(dev,kernel_string);  UCL_Kernel k_vec_add(program,"vec_add");  // Allocate storage on host and device for input  // - Vector is double precision on host and single on accelerator  // - If dev is a CPU or shares memory with the host, no allocation  //   is performed on the device  UCL_Vector<double,float> a(6,dev), b(6,dev);  // Allocate memory for answer  UCL_D_Vec<float> answer(6,dev,UCL_WRITE_ONLY);   // Get the data on the host  for (int i=0; i<6; i++) { a[i]=i; b[i]=i; }   // Get the data on the device (copy ignored if device is a CPU, but  //   typecast is performed if necessary.  timer_com.start();  a.update_device();  b.update_device();  timer_com.stop();   // Set up 1-dimensional kernel grid to add 6 elements and run on device  timer_kernel.start();  size_t num_blocks=6, block_size=1;  k_vec_add.set_size(num_blocks,block_size);  // Enqueue the kernel in the default command queue to be run  k_vec_add.run(&a,&b,&answer);  timer_kernel.stop();  // Print the results  std::cout << "Answer: " << answer << std::endl            << "Input copy time: " << timer_com.seconds() << std::endl            << "Kernel time: " << timer_kernel.seconds() << std::endl;     return 0;}
