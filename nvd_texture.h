@@ -42,15 +42,24 @@ class UCL_Texture {
     { CU_SAFE_CALL(cuModuleGetTexRef(&_tex, prog._module, texture_name)); }
 
   /// Bind a float array where each fetch grabs a vector of length numel
-  template<class mat_typ>
-  inline void bind_float(mat_typ &vec, const unsigned numel) {
-    #ifdef UCL_DEBUG
-    assert(numel!=0 && numel<5);
-    #endif
-    CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
-                 vec.numel()*vec.element_size()));
-    CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
-  }
+  template<class numtyp>
+  inline void bind_float(UCL_D_Vec<numtyp> &vec, const unsigned numel) 
+    { _bind_float(vec,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp>
+  inline void bind_float(UCL_D_Mat<numtyp> &vec, const unsigned numel) 
+    { _bind_float(vec,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp, class devtyp>
+  inline void bind_float(UCL_Vector<numtyp, devtyp> &vec, const unsigned numel) 
+    { _bind_float(vec.device,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp, class devtyp>
+  inline void bind_float(UCL_Matrix<numtyp, devtyp> &vec, const unsigned numel) 
+    { _bind_float(vec.device,numel); }
 
   /// Unbind the texture reference from the memory allocation
   inline void unbind() { }
@@ -65,6 +74,17 @@ class UCL_Texture {
  private:
   CUtexref _tex;
   friend class UCL_Kernel;
+
+  template<class mat_typ>
+  inline void _bind_float(mat_typ &vec, const unsigned numel) {
+    #ifdef UCL_DEBUG
+    assert(numel!=0 && numel<5);
+    #endif
+    CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
+                 vec.numel()*vec.element_size()));
+    CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
+  }
+
 };
 
 } // namespace

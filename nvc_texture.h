@@ -44,8 +44,35 @@ class UCL_Texture {
   }
 
   /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp>
+  inline void bind_float(UCL_D_Vec<numtyp> &vec, const unsigned numel) 
+    { _bind_float(vec,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp>
+  inline void bind_float(UCL_D_Mat<numtyp> &vec, const unsigned numel) 
+    { _bind_float(vec,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp, class devtyp>
+  inline void bind_float(UCL_Vector<numtyp, devtyp> &vec, const unsigned numel) 
+    { _bind_float(vec.device,numel); }
+
+  /// Bind a float array where each fetch grabs a vector of length numel
+  template<class numtyp, class devtyp>
+  inline void bind_float(UCL_Matrix<numtyp, devtyp> &vec, const unsigned numel) 
+    { _bind_float(vec.device,numel); }
+
+  /// Unbind the texture reference from the memory allocation
+  inline void unbind() { CUDA_SAFE_CALL(cudaUnbindTexture(_tex_ptr)); }
+
+ private:
+  textureReference *_tex_ptr;
+  cudaChannelFormatDesc _channel;
+
+  /// Bind a float array where each fetch grabs a vector of length numel
   template<class mat_typ>
-  inline void bind_float(mat_typ &vec, const unsigned numel) {
+  inline void _bind_float(mat_typ &vec, const unsigned numel) {
     #ifdef UCL_DEBUG
     assert(numel!=0 && numel<5);
     #endif
@@ -59,13 +86,6 @@ class UCL_Texture {
     (*_tex_ptr).normalized = false;
     CUDA_SAFE_CALL(cudaBindTexture(NULL,_tex_ptr,vec.cbegin(),&_channel));
   }
-
-  /// Unbind the texture reference from the memory allocation
-  inline void unbind() { CUDA_SAFE_CALL(cudaUnbindTexture(_tex_ptr)); }
-
- private:
-  textureReference *_tex_ptr;
-  cudaChannelFormatDesc _channel;
 };
 
 } // namespace
