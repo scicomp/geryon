@@ -29,6 +29,13 @@
 
 namespace ucl_opencl {
     
+class UCL_Texture;
+template <class numtyp> class UCL_D_Vec;
+template <class numtyp> class UCL_D_Mat;
+template <class hosttype, class devtype> class UCL_Vector;
+template <class hosttype, class devtype> class UCL_Matrix;
+#define UCL_MAX_KERNEL_ARGS 256
+
 /// Class storing 1 or more kernel functions from a single string or file
 class UCL_Program {
  public:
