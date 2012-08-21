@@ -82,7 +82,14 @@ class UCL_Texture {
     #endif
     CU_SAFE_CALL(cuTexRefSetAddress(NULL, _tex, vec.cbegin(), 
                  vec.numel()*vec.element_size()));
-    CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
+    if (vec.element_size()==sizeof(float))
+      CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_FLOAT, numel));
+    else {
+      if (numel>2)
+        CU_SAFE_CALL(cuTexRefSetFormat(_tex, CU_AD_FORMAT_SIGNED_INT32, numel));
+      else
+        CU_SAFE_CALL(cuTexRefSetFormat(_tex,CU_AD_FORMAT_SIGNED_INT32,numel*2));
+    }
   }
 
 };

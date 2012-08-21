@@ -78,8 +78,12 @@ class UCL_Texture {
     #endif
     int bits[4]={0,0,0,0};
     for (int i=0; i<numel; i++) bits[i]=32;
-    _channel = cudaCreateChannelDesc(bits[0], bits[1], bits[2], bits[3], 
-                                     cudaChannelFormatKindFloat);
+    if (vec.element_size()==sizeof(float))
+      _channel = cudaCreateChannelDesc(bits[0], bits[1], bits[2], bits[3], 
+                                       cudaChannelFormatKindFloat);
+    else
+      _channel = cudaCreateChannelDesc(bits[0], bits[1], bits[2], bits[3], 
+                                       cudaChannelFormatKindSigned);
     (*_tex_ptr).addressMode[0] = cudaAddressModeClamp;
     (*_tex_ptr).addressMode[1] = cudaAddressModeClamp;
     (*_tex_ptr).filterMode = cudaFilterModePoint;
