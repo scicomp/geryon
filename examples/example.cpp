@@ -4,8 +4,8 @@
   Vector add example (Host Code)
 
  ***************************************************************************/
-
-#ifdef USE_CUDA_DRIVER
+  
+#ifdef UCL_CUDADR
 #include "nvd_device.h"
 #include "nvd_timer.h"
 #include "nvd_mat.h"
@@ -14,7 +14,7 @@
 using namespace ucl_cudadr;
 #endif
 
-#ifdef USE_OPENCL
+#ifdef UCL_OPENCL
 #include "ocl_device.h"
 #include "ocl_mat.h"
 #include "ocl_timer.h"
@@ -23,7 +23,7 @@ using namespace ucl_cudadr;
 using namespace ucl_opencl;
 #endif
 
-#ifdef USE_CUDA_RUNTIME
+#ifdef UCL_CUDART
 #include "nvc_device.h"
 #include "nvc_mat.h"
 #include "nvc_timer.h"

@@ -302,10 +302,11 @@ inline UCL_Device::~UCL_Device() {
 
 inline int UCL_Device::create_context() {
   cl_int errorv;
-  cl_context_properties props[3];
-  props[0]=CL_CONTEXT_PLATFORM;
-  props[1]=_platform;
-  props[2]=0;
+  // MRR: Unused property at this time
+  //cl_context_properties props[3];
+  //props[0]=CL_CONTEXT_PLATFORM;
+  //props[1]=_platform;
+  //props[2]=0;
   _context=clCreateContext(0,1,&_cl_device,NULL,NULL,&errorv);
   if (errorv!=CL_SUCCESS) {
     #ifndef UCL_NO_EXIT

@@ -23,7 +23,7 @@
 
 #ifndef NVD_KERNEL
 #define NVD_KERNEL
-
+ 
 #include "nvd_device.h"
 #include <fstream>
 
@@ -103,8 +103,9 @@ class UCL_Program {
       std::cerr << std::endl
                 << "----------------------------------------------------------\n"
                 << " UCL Error: Error compiling PTX Program...\n"
+                << " Program: \n" << (const char *)program << std::endl
                 << "----------------------------------------------------------\n";
-      std::cerr << log << std::endl;
+      std::cerr << log << std::endl;   
       #endif
       return UCL_COMPILE_ERROR;
     }
