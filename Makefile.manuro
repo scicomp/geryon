@@ -8,6 +8,7 @@
 TARGET    = DEBUG
 
 # CUDA directory 
+#NVC_DIR   = /opt/cuda-4.1.28/cuda
 NVC_DIR   = /opt/cuda-5.0.7/cuda
 NVC_ARCH  = -arch=sm_20
 NVC_CPP   = -ccbin=g++
@@ -16,6 +17,7 @@ NVC_INCS  = -I$(NVC_DIR)/include
 
 # OpenCL directory (optional)
 OCL_LIBS  = -L/usr/lib/ -lOpenCL
+#OCL_INCS  = -I/opt/cuda-4.1.28/cuda/include
 OCL_INCS  = -I/opt/cuda-5.0.7/cuda/include
 
 # Ordinary C/C++ includes and libraries

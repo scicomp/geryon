@@ -19,7 +19,7 @@ using namespace ucl_cudadr;
 #include "ocl_mat.h"
 #include "ocl_timer.h"
 #include "ocl_kernel.h"
-#include "example_kernel.h"
+#include "example_kernel_str.h"
 using namespace ucl_opencl;
 #endif
 
