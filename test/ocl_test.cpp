@@ -58,10 +58,10 @@ void fill_test(mat_type &mat, const size_t rows, const size_t cols) {
 }
 
 template <class numtyp>
-void opencl_test(const bool async) {
+void opencl_test(const bool async, const string cubin_dir) {
   using namespace ucl_opencl;
   #include "ucl_test_source.h"
-  string kernel_name="ucl_test_kernel.cu";  
+  string kernel_name=cubin_dir+string("/ucl_test_kernel.cu");  
   const char *kernel_string=ocl_string_test;
   #include "ucl_test_vecadd.h"  
   cerr << "DONE.\n";
@@ -78,25 +78,25 @@ int main(int argc, char** argv) {
   cerr << "----------------------------------------------------------------\n";
   cerr << "|            Single Precision OpenCL Blocking Tests            |\n";
   cerr << "----------------------------------------------------------------\n";
-  opencl_test<float>(false);
+  opencl_test<float>(false,cubin_dir);
   cerr << "\n\n";
 
   cerr << "----------------------------------------------------------------\n";
   cerr << "|          Single Precision OpenCL Asynchronous Tests          |\n";
   cerr << "----------------------------------------------------------------\n";
-  opencl_test<float>(true);
+  opencl_test<float>(true,cubin_dir);
   cerr << "\n\n";
 
   cerr << "----------------------------------------------------------------\n";
   cerr << "|            Double Precision OpenCL Blocking Tests            |\n";
   cerr << "----------------------------------------------------------------\n";
-  opencl_test<double>(false);
+  opencl_test<double>(false,cubin_dir);
   cerr << "\n\n";
 
   cerr << "----------------------------------------------------------------\n";
   cerr << "|          Double Precision OpenCL Asynchronous Tests          |\n";
   cerr << "----------------------------------------------------------------\n";
-  opencl_test<double>(true);
+  opencl_test<double>(true,cubin_dir);
   cerr << "\n\n";
 
   cerr << "ALL TESTS PASSED.\n\n\n";

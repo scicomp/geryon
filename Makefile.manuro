@@ -27,14 +27,14 @@ CPP_INCS  =
 # Define additional debug flags 
 ifeq ($(TARGET), DEBUG)
 NVC_FLAGS = -O0 -g -G -Xptxas=-v $(NVC_CPP) $(NVC_ARCH) 
-OCL_FLAGS = -O0 -g -Wall -DDEBUG -DUNIX
+OCL_FLAGS = -O0 -g -Wall -DDEBUG -DUNIX -DUCL_DEBUG -DUCL_NO_EXIT
 CPP_FLAGS = -O0 -g -Wall -DDEBUG -DUCL_DEBUG -DUCL_NO_EXIT
 endif
 
 # Define additional release flags 
 ifeq ($(TARGET), RELEASE)
 NVC_FLAGS = -O3 -Xptxas=-v --use_fast_math $(NVC_CPP) $(NVC_ARCH) 
-OCL_FLAGS = -O3 -Wall -DNDEBUG -DUNIX
+OCL_FLAGS = -O3 -Wall -DNDEBUG -DUNIX -DUCL_DEBUG -DUCL_NO_EXIT
 CPP_FLAGS = -O3 -Wall -DNDEBUG -DUCL_DEBUG -DUCL_NO_EXIT
 endif
 

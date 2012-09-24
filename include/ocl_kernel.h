@@ -75,6 +75,7 @@ class UCL_Program {
   /// Load a program from a file and compile with flags
   inline int load(const char *filename, const char *flags="",
                   std::string *log=NULL) {
+      
     std::ifstream in(filename);
     if (!in || in.is_open()==false) {
       #ifndef UCL_NO_EXIT 
@@ -84,10 +85,11 @@ class UCL_Program {
       #endif
       return UCL_FILE_NOT_FOUND;
     }
-  
+
     std::string program((std::istreambuf_iterator<char>(in)),
                         std::istreambuf_iterator<char>());
     in.close();
+
     return load_string(program.c_str(),flags,log);
   }
   
