@@ -22,15 +22,15 @@
    ----------------------------------------------------------------------- */
 
   cerr << "Kernel (vector add) tests.\n";
-  {
-    cerr << "  Loading/compiling kernel from string...";
-    string flags=string("-D Ordinal=int -D Scalar=")+
-                 ucl_template_name<numtyp>();
-    UCL_Program p_vec_add(cop);
-    p_vec_add.load_string(kernel_string,flags.c_str());
-    UCL_Kernel k_vec_add(p_vec_add,"vec_add");
-    cerr << "Done.\n";
-  }
+//  {
+//    cerr << "  Loading/compiling kernel from string...";
+//    string flags=string("-D Ordinal=int -D Scalar=")+
+//                 ucl_template_name<numtyp>();
+//    UCL_Program p_vec_add(cop);
+//    p_vec_add.load_string(kernel_string,flags.c_str());
+//    UCL_Kernel k_vec_add(p_vec_add,"vec_add");
+//    cerr << "Done.\n";
+//  }
   
   cerr << "  Loading/compiling kernel from file...";
   string flags=string("-D Ordinal=int -D Scalar=")+ucl_template_name<numtyp>();
@@ -73,8 +73,7 @@
   k_vec_add.clear_args();
   k_vec_add.set_size(2,3);
   k_vec_add.add_args(&cop_a.begin(),&cop_b.begin(),&answer.begin());
-  k_vec_add.run(&cop_a.begin(),&cop_b.begin(),
-                &answer.begin());
+  k_vec_add.run(&cop_a.begin(),&cop_b.begin(),&answer.begin());
   cerr << "Done.\n";
   timer_kernel.stop();
   

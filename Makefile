@@ -35,7 +35,7 @@ BIN_DIR = bin
 OBJ_DIR = obj
 INC_DIR = ./include
 
-# Define the examples here
+# Examples
 nvc_example = nvc_example.o example_kernel.o 
 nvd_example = nvd_example.o  
 ocl_example = ocl_example.o  
@@ -44,22 +44,33 @@ nvc_get_devices = nvc_get_devices.o
 nvd_get_devices = nvd_get_devices.o
 ocl_get_devices = ocl_get_devices.o
 
+# UCL test
 ucl_test      = ucl_test.o ucl_test_kernel.o 
 ucl_test_dep  = $(BIN_DIR)/ucl_test_kernel.ptx $(BIN_DIR)/ucl_test_kernel_d.ptx
 ucl_test_dep += $(BIN_DIR)/ucl_test_kernel.cubin 
+
+# NVD tests
+nvd_test      = nvd_test.o
+nvd_test_dep  = $(BIN_DIR)/ucl_test_kernel.ptx $(BIN_DIR)/ucl_test_kernel_d.ptx
+
+# NVC tests
+nvc_test      = nvc_test.o ucl_test_kernel.o
+
+# OCL tests
+ocl_test      = ocl_test.o
 
 # Define your executables here
 NVC_EXE = nvc_get_devices nvc_example 
 NVD_EXE = nvd_get_devices nvd_example 
 OCL_EXE = ocl_get_devices ocl_example 
-TST_EXE = ucl_test 
+TST_EXE = ucl_test nvd_test nvc_test ocl_test
 
 
 # Generate binary targets
 NVC_BIN = $(addprefix $(BIN_DIR)/,$(NVC_EXE))
 NVD_BIN = $(addprefix $(BIN_DIR)/,$(NVD_EXE))
 OCL_BIN = $(addprefix $(BIN_DIR)/,$(OCL_EXE))
-TST_BIN = $(addprefix $(BIN_DIR)/,ucl_test)
+TST_BIN = $(addprefix $(BIN_DIR)/,$(TST_EXE))
 
 # Compile lines
 NVC += $(NVC_FLAGS) $(NVC_INCS) -I$(INC_DIR)
@@ -78,25 +89,32 @@ define nvc_template
 OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(NVC) -o $$@ $$^ -DUCL_CUDART $$(NVC_LIBS)
+
+$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
 endef
 
 define nvd_template
 OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(NVC) -o $$@ $$^ -DUCL_CUDADR $$(NVC_LIBS)
+
+$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
 endef
 
 define ocl_template
 OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(OCL) -o $$@ $$^ -DUCL_OPENCL $$(OCL_LIBS)
+
+$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
 endef
 
 define tst_template
+OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
-	$(OCL) -o $$@ $$^ -DUCL_OPENCL $$(OCL_LIBS) $$(CPP_LIBS) $$(NVC_LIBS)
+	$(OCL) -o $$@ $$^ $$(OCL_LIBS) $$(CPP_LIBS) $$(NVC_LIBS)
 
-$(1): $(BIN_DIR)/$(1) $$($(1)_dep)
+$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
 endef
 
 $(foreach p,$(NVC_EXE),$(eval $(call nvc_template,$(p))))
@@ -163,6 +181,5 @@ dist: clean
 	@echo "Geryon Version $(VERSION)" > VERSION.txt
 	@echo "#define GERYON_VERSION \0042$(VERSION)\0042" > $(INC_DIR)/ucl_version.h
 	@tar -cz doc examples test include Makefile* > geryon.$(VERSION).tar.gz
-
 
 
