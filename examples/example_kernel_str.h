@@ -1,5 +1,4 @@
 // For testing the example compile only
-
 const char * kernel_string = 
 "#ifdef NV_KERNEL\n"
 "#define __global  \n"
