@@ -10,7 +10,7 @@
 #include "nvd_timer.h"
 #include "nvd_mat.h"
 #include "nvd_kernel.h"
-#include "example_kernel.h"
+#include "example_kernel_bin.h"
 using namespace ucl_cudadr;
 #endif
 

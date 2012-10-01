@@ -30,41 +30,49 @@ else
 include Makefile.$(arch)
 endif
 
+SH = /bin/sh
+
 # Target binary, object and source(include) directory 
 BIN_DIR = bin
 OBJ_DIR = obj
-INC_DIR = ./include
+INC_DIR = include
 
-# Examples
+# Example: vec_add
 nvc_example = nvc_example.o example_kernel.o 
 nvd_example = nvd_example.o  
+nvd_example_dep = example_kernel_bin.h 
 ocl_example = ocl_example.o  
+ocl_example_dep = example_kernel_str.h  
 
+# Example: get_devices
 nvc_get_devices = nvc_get_devices.o
 nvd_get_devices = nvd_get_devices.o
 ocl_get_devices = ocl_get_devices.o
 
+# Example: smooth3d7
+nvc_smooth3d7 = nvc_smooth3d7.o smooth3d7_kernel.o
+nvd_smooth3d7 = nvd_smooth3d7.o  
+nvd_smooth3d7_dep = smooth3d7_kernel_bin.h  
+ocl_smooth3d7 = ocl_smooth3d7.o 
+ocl_smooth3d7_dep = smooth3d7_kernel_str.h
+
 # UCL test
 ucl_test      = ucl_test.o ucl_test_kernel.o 
-ucl_test_dep  = $(BIN_DIR)/ucl_test_kernel.ptx $(BIN_DIR)/ucl_test_kernel_d.ptx
-ucl_test_dep += $(BIN_DIR)/ucl_test_kernel.cubin 
+ucl_test_dep  = ucl_test_kernel.ptx ucl_test_kernel_d.ptx
+ucl_test_dep += ucl_test_kernel.cubin ucl_test_kernel.cu
 
-# NVD tests
-nvd_test      = nvd_test.o
-nvd_test_dep  = $(BIN_DIR)/ucl_test_kernel.ptx $(BIN_DIR)/ucl_test_kernel_d.ptx
-
-# NVC tests
+# Stand-alone tests
 nvc_test      = nvc_test.o ucl_test_kernel.o
-
-# OCL tests
+nvd_test      = nvd_test.o
+nvd_test_dep  = ucl_test_kernel.ptx ucl_test_kernel_d.ptx
 ocl_test      = ocl_test.o
+ocl_test_dep  = ucl_test_kernel.cu
 
 # Define your executables here
-NVC_EXE = nvc_get_devices nvc_example 
-NVD_EXE = nvd_get_devices nvd_example 
-OCL_EXE = ocl_get_devices ocl_example 
+NVC_EXE = nvc_get_devices nvc_example nvc_smooth3d7 
+NVD_EXE = nvd_get_devices nvd_example nvd_smooth3d7
+OCL_EXE = ocl_get_devices ocl_example ocl_smooth3d7
 TST_EXE = ucl_test nvd_test nvc_test ocl_test
-
 
 # Generate binary targets
 NVC_BIN = $(addprefix $(BIN_DIR)/,$(NVC_EXE))
@@ -73,24 +81,24 @@ OCL_BIN = $(addprefix $(BIN_DIR)/,$(OCL_EXE))
 TST_BIN = $(addprefix $(BIN_DIR)/,$(TST_EXE))
 
 # Compile lines
-NVC += $(NVC_FLAGS) $(NVC_INCS) -I$(INC_DIR)
-OCL += $(OCL_FLAGS) $(OCL_INCS) -I$(INC_DIR)
-CPP += $(CPP_FLAGS) $(CPP_INCS) -I$(INC_DIR)
+NVC += $(NVC_FLAGS) $(NVC_INCS) -I$(INC_DIR) -I$(OBJ_DIR)
+OCL += $(OCL_FLAGS) $(OCL_INCS) -I$(INC_DIR) -I$(OBJ_DIR)
+CPP += $(CPP_FLAGS) $(CPP_INCS) -I$(INC_DIR) -I$(OBJ_DIR)
 
 # Prevent from deleating itermediate files
-.SECONDARY: $(OBJ) obj/example_kernel.cubin
+.SECONDARY: $(OBJ)
 .PHONY: test all setup clean
 .NOTPARALLEL: setup clean
 
 # Default makefile target
-all: setup $(NVC_BIN) $(NVD_BIN) $(OCL_BIN) $(TST_EXE)
+all: setup $(NVC_EXE) $(NVD_EXE) $(OCL_EXE) $(TST_EXE)
 
 define nvc_template
 OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(NVC) -o $$@ $$^ -DUCL_CUDART $$(NVC_LIBS)
 
-$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
+$(1): setup $$(addprefix $$(OBJ_DIR)/,$$($(1)_dep)) $(BIN_DIR)/$(1) 
 endef
 
 define nvd_template
@@ -98,7 +106,7 @@ OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(NVC) -o $$@ $$^ -DUCL_CUDADR $$(NVC_LIBS)
 
-$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
+$(1): setup $$(addprefix $$(OBJ_DIR)/,$$($(1)_dep)) $(BIN_DIR)/$(1) 
 endef
 
 define ocl_template
@@ -106,7 +114,7 @@ OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(OCL) -o $$@ $$^ -DUCL_OPENCL $$(OCL_LIBS)
 
-$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
+$(1): setup $$(addprefix $$(OBJ_DIR)/,$$($(1)_dep)) $(BIN_DIR)/$(1) 
 endef
 
 define tst_template
@@ -114,7 +122,7 @@ OBJ += $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 $(BIN_DIR)/$(1): $$(addprefix $$(OBJ_DIR)/,$$($(1)))
 	$(OCL) -o $$@ $$^ $$(OCL_LIBS) $$(CPP_LIBS) $$(NVC_LIBS)
 
-$(1): setup $(BIN_DIR)/$(1) $$($(1)_dep)
+$(1): setup $$(addprefix $$(BIN_DIR)/,$$($(1)_dep)) $(BIN_DIR)/$(1)
 endef
 
 $(foreach p,$(NVC_EXE),$(eval $(call nvc_template,$(p))))
@@ -137,10 +145,15 @@ $(OBJ_DIR)/ocl_%.o: examples/%.cpp
 	$(OCL) -MMD -o $@ -c $< -DUCL_OPENCL
 
 $(OBJ_DIR)/%.o: examples/%.cu
-	$(NVC) -DNV_KERNEL -DORDINAL=int -DScalar=float -o $@ -c $<
-	$(NVC) -DNV_KERNEL -DORDINAL=int -DScalar=float -cubin -o $(OBJ_DIR)/$*.cubin $<
-	bin2c -c -n kernel_string $(OBJ_DIR)/$*.cubin > examples/$*.h
+	$(NVC) -DNV_KERNEL -o $@ -c $<
 
+$(OBJ_DIR)/%_bin.h: examples/%.cu
+	$(NVC) -DNV_KERNEL -cubin -o $(OBJ_DIR)/$*.cubin $<
+	bin2c -c -n kernel_string $(OBJ_DIR)/$*.cubin > $(OBJ_DIR)/$*_bin.h
+
+$(OBJ_DIR)/%_str.h: examples/%.cu
+	$(SH) script/file_to_cstr.sh kernel_string examples/$*.cu $(OBJ_DIR)/$*_str.h
+	
 # Rules to build the test cases
 $(OBJ_DIR)/%.o: test/%.cpp 
 	$(CPP) -MMD $(NVC_INCS) $(OCL_INCS) -o $@ -c $<
@@ -154,11 +167,13 @@ $(BIN_DIR)/%_d.ptx: test/%.cu
 $(BIN_DIR)/%.cubin: test/%.cu
 	$(NVC) -DNV_KERNEL -DOrdinal=int -DScalar=float -cubin -o $@ $<	
 
+$(BIN_DIR)/%.cu: test/%.cu
+	cp $^ $@
+
 $(OBJ_DIR)/%.o: test/%.cu
 	$(NVC) -DNV_KERNEL -DOrdinal=int -DScalar=float -o $@ -c $<
 
 test: setup $(TST_EXE)
-	cp test/*.cu $(BIN_DIR)/
 	
 # Rule for doxygen
 dox:
