@@ -1,5 +1,5 @@
-#ifndef UCL_NAMESPACE_H
-#define UCL_NAMESPACE_H
+#ifndef GERYON_H
+#define GERYON_H
 
 #ifdef UCL_OPENCL
 #include "ocl_device.h"
