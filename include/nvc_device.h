@@ -52,6 +52,9 @@ class UCL_Device {
   /** \note You must set the active GPU with set() before using the device **/
   UCL_Device();
   
+  /// Initialize the device with a given id
+  UCL_Device(unsigned int id);
+  
   ~UCL_Device();
 
   /// Returns 1 (For compatibility with OpenCL)
@@ -208,6 +211,22 @@ inline UCL_Device::UCL_Device() {
   _device=-1;
   _cq.push_back(cudaStream_t());
   _cq.back()=0;
+}
+
+inline UCL_Device::UCL_Device(unsigned int id) {
+  CUDA_SAFE_CALL_NS(cudaGetDeviceCount(&_num_devices));
+  for (int dev=0; dev<_num_devices; ++dev) {
+    cudaDeviceProp deviceProp;
+    CUDA_SAFE_CALL_NS(cudaGetDeviceProperties(&deviceProp, dev));
+    if (deviceProp.major == 9999 && deviceProp.minor == 9999)
+      break;
+    _properties.push_back(deviceProp);
+    _device_ids.push_back(dev);
+  }
+  _device=-1;
+  _cq.push_back(cudaStream_t());
+  _cq.back()=0;
+  set(id);
 }
 
 inline UCL_Device::~UCL_Device() {

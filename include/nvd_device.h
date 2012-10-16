@@ -66,6 +66,9 @@ class UCL_Device {
   /// Collect properties for every GPU on the node
   /** \note You must set the active GPU with set() before using the device **/
   UCL_Device();
+
+  /// Initialize the device with a given id
+  UCL_Device(unsigned int id);
   
   ~UCL_Device();
 
@@ -278,6 +281,60 @@ inline UCL_Device::UCL_Device() {
   _device=-1;
   _cq.push_back(CUstream());
   _cq.back()=0;
+}
+
+// Grabs the properties for all devices
+inline UCL_Device::UCL_Device(unsigned int id) {
+  CU_SAFE_CALL_NS(cuInit(0));
+  CU_SAFE_CALL_NS(cuDeviceGetCount(&_num_devices));
+  for (int dev=0; dev<_num_devices; ++dev) {
+    CUdevice m;
+    CU_SAFE_CALL_NS(cuDeviceGet(&m,dev));
+    int major, minor;
+    CU_SAFE_CALL_NS(cuDeviceComputeCapability(&major,&minor,m));
+    if (major==9999)
+      continue;
+      
+    _properties.push_back(NVDProperties());
+    _properties.back().device_id=dev;
+    _properties.back().major=major;
+    _properties.back().minor=minor;
+    
+    char namecstr[1024];
+    CU_SAFE_CALL_NS(cuDeviceGetName(namecstr,1024,m));
+    _properties.back().name=namecstr;
+    
+    CU_SAFE_CALL_NS(cuDeviceTotalMem(&_properties.back().totalGlobalMem,m));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(&_properties.back().multiProcessorCount,
+                                       CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
+                                         m));
+    CU_SAFE_CALL_NS(cuDeviceGetProperties(&_properties.back().p,m));
+    #if CUDA_VERSION >= 2020
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().kernelExecTimeoutEnabled, 
+                      CU_DEVICE_ATTRIBUTE_KERNEL_EXEC_TIMEOUT,dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().integrated,
+                      CU_DEVICE_ATTRIBUTE_INTEGRATED, dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().canMapHostMemory, 
+                      CU_DEVICE_ATTRIBUTE_CAN_MAP_HOST_MEMORY, dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(&_properties.back().computeMode, 
+                      CU_DEVICE_ATTRIBUTE_COMPUTE_MODE,dev));
+    #endif
+    #if CUDA_VERSION >= 3010
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().concurrentKernels, 
+                      CU_DEVICE_ATTRIBUTE_CONCURRENT_KERNELS, dev));
+    CU_SAFE_CALL_NS(cuDeviceGetAttribute(
+                      &_properties.back().ECCEnabled,  
+                      CU_DEVICE_ATTRIBUTE_ECC_ENABLED, dev));
+    #endif
+  }
+  _device=-1;
+  _cq.push_back(CUstream());
+  _cq.back()=0;
+  set(id);
 }
 
 inline UCL_Device::~UCL_Device() {

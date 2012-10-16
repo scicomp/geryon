@@ -75,6 +75,9 @@ class UCL_Device {
   /// Collect properties for every device on the node
    /** \note You must set the active GPU with set() before using the device **/
   UCL_Device();
+
+  /// Initialize the device with a given id
+  UCL_Device(unsigned int id);
   
   ~UCL_Device();
 
@@ -288,6 +291,48 @@ inline UCL_Device::UCL_Device() {
     _cl_devices.push_back(device_list[i]);
     add_properties(device_list[i]);
   }
+}
+
+// Grabs the properties for all devices
+inline UCL_Device::UCL_Device(unsigned int id) {
+  cl_int errorv;
+  cl_uint nplatforms;
+  
+  _cl_device=0;
+  _device=-1;
+  _num_devices=0;
+  _platform=0;
+  _default_cq=0;
+
+  // --- Get Number of Platforms
+  errorv=clGetPlatformIDs(1,&_cl_platform,&nplatforms);
+  
+  if (errorv!=CL_SUCCESS) {
+    _num_platforms=0;
+    return;
+  } else
+    _num_platforms=static_cast<int>(nplatforms);
+ 
+  
+  // --- Get Number of Devices
+  cl_uint n;
+  errorv=clGetDeviceIDs(_cl_platform,CL_DEVICE_TYPE_ALL,0,NULL,&n);
+  _num_devices=n;
+  if (errorv!=CL_SUCCESS || _num_devices==0) {
+    _num_devices=0;
+    return;
+  }
+  cl_device_id device_list[_num_devices];
+  CL_SAFE_CALL(clGetDeviceIDs(_cl_platform,CL_DEVICE_TYPE_ALL,n,device_list,
+                              &n));
+  
+  // --- Store properties for each device
+  for (int i=0; i<_num_devices; i++) {
+    _cl_devices.push_back(device_list[i]);
+    add_properties(device_list[i]);
+  }
+  
+  set(id);
 }
 
 inline UCL_Device::~UCL_Device() {
