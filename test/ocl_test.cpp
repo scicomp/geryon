@@ -21,11 +21,12 @@
    the Simplified BSD License.
    ----------------------------------------------------------------------- */
 
-#include "ocl_device.h"
-#include "ocl_mat.h"
-#include "ocl_timer.h"
-#include "ocl_kernel.h"
-#include "ocl_texture.h"
+//#include "ocl_device.h"
+//#include "ocl_mat.h"
+//#include "ocl_timer.h"
+//#include "ocl_kernel.h"
+//#include "ocl_texture.h"
+#include "geryon.h"
 #include <cassert>
 #include <sstream>
 

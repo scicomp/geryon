@@ -160,8 +160,17 @@ $(OBJ_DIR)/%_str.h: examples/%.cu
 	$(SH) tools/file_to_cstr.sh kernel_string examples/$*.cu $(OBJ_DIR)/$*_str.h
 	
 # Rules to build the test cases
-$(OBJ_DIR)/%.o: test/%.cpp 
+$(OBJ_DIR)/ucl_%.o: test/ucl_%.cpp 
 	$(CPP) -MMD $(NVC_INCS) $(OCL_INCS) -o $@ -c $<
+
+$(OBJ_DIR)/ocl_%.o: test/ocl_%.cpp 
+	$(CPP) -MMD -DUCL_OPENCL $(OCL_INCS) -o $@ -c $<
+
+$(OBJ_DIR)/nvc_%.o: test/nvc_%.cpp 
+	$(CPP) -MMD -DUCL_CUDART $(NVC_INCS) -o $@ -c $<
+
+$(OBJ_DIR)/nvd_%.o: test/nvd_%.cpp 
+	$(CPP) -MMD -DUCL_CUDADR $(NVC_INCS) -o $@ -c $<
 
 $(BIN_DIR)/%.ptx: test/%.cu
 	$(NVC) -DNV_KERNEL -DOrdinal=int -DScalar=float -ptx -o $@ $<	

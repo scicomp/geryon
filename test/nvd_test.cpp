@@ -21,11 +21,8 @@
    the Simplified BSD License.
    ----------------------------------------------------------------------- */
 
-#include "nvd_device.h"
-#include "nvd_mat.h"
-#include "nvd_timer.h"
-#include "nvd_kernel.h"
-#include "nvd_texture.h"
+#include "geryon.h"
+
 #include <cassert>
 #include <sstream>
 

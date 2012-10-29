@@ -87,7 +87,9 @@ using namespace ucl_cudadr;
 #ifdef UCL_CUDART
 #include "nvc_device.h"
 #include "nvc_mat.h"
+#if CUDART_VERSION >= 4000
 #include "nvc_kernel.h"
+#endif
 #include "nvc_macros.h"
 #include "nvc_memory.h"
 #include "nvc_texture.h"

@@ -38,6 +38,7 @@
 #include "nvc_texture.h"
 #include "nvd_texture.h"
 #include "ocl_texture.h"
+
 #include <cassert>
 #include <sstream>
 
