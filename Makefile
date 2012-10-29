@@ -49,13 +49,6 @@ nvc_get_devices = nvc_get_devices.o
 nvd_get_devices = nvd_get_devices.o
 ocl_get_devices = ocl_get_devices.o
 
-# Example: smooth3d7
-nvc_smooth3d7 = nvc_smooth3d7.o smooth3d7_kernel.o
-nvd_smooth3d7 = nvd_smooth3d7.o  
-nvd_smooth3d7_dep = smooth3d7_kernel_bin.h  
-ocl_smooth3d7 = ocl_smooth3d7.o 
-ocl_smooth3d7_dep = smooth3d7_kernel_str.h
-
 # UCL test
 ucl_test      = ucl_test.o ucl_test_kernel.o 
 ucl_test_dep  = ucl_test_kernel.ptx ucl_test_kernel_d.ptx
@@ -69,9 +62,9 @@ ocl_test      = ocl_test.o
 ocl_test_dep  = ucl_test_kernel.cu
 
 # Define your executables here
-NVC_EXE = nvc_get_devices nvc_example nvc_smooth3d7 
-NVD_EXE = nvd_get_devices nvd_example nvd_smooth3d7
-OCL_EXE = ocl_get_devices ocl_example ocl_smooth3d7
+NVC_EXE = nvc_get_devices nvc_example  
+NVD_EXE = nvd_get_devices nvd_example 
+OCL_EXE = ocl_get_devices ocl_example 
 TST_EXE = ucl_test nvd_test nvc_test ocl_test
 
 # Generate binary targets
@@ -134,6 +127,16 @@ $(foreach p,$(TST_EXE),$(eval $(call tst_template,$(p))))
 OBJ_DEP = $(OBJ:%.o=%.d)
 -include $(OBJ_DEP)
 
+# Rules for compiling the tools object files
+$(OBJ_DIR)/nvc_%.o: tools/%.cpp 
+	$(NVC) -Xcompiler=-MMD -o $@ -c $< -DUCL_CUDART
+
+$(OBJ_DIR)/nvd_%.o: tools/%.cpp
+	$(NVC) -Xcompiler=-MMD -o $@ -c $< -DUCL_CUDADR
+
+$(OBJ_DIR)/ocl_%.o: tools/%.cpp
+	$(OCL) -MMD -o $@ -c $< -DUCL_OPENCL
+
 # Rules for compiling the example object files
 $(OBJ_DIR)/nvc_%.o: examples/%.cpp 
 	$(NVC) -Xcompiler=-MMD -o $@ -c $< -DUCL_CUDART
@@ -152,7 +155,7 @@ $(OBJ_DIR)/%_bin.h: examples/%.cu
 	bin2c -c -n kernel_string $(OBJ_DIR)/$*.cubin > $(OBJ_DIR)/$*_bin.h
 
 $(OBJ_DIR)/%_str.h: examples/%.cu
-	$(SH) script/file_to_cstr.sh kernel_string examples/$*.cu $(OBJ_DIR)/$*_str.h
+	$(SH) tools/file_to_cstr.sh kernel_string examples/$*.cu $(OBJ_DIR)/$*_str.h
 	
 # Rules to build the test cases
 $(OBJ_DIR)/%.o: test/%.cpp 
