@@ -21,13 +21,6 @@
    the Simplified BSD License.
    ----------------------------------------------------------------------- */
 
-//#include "nvc_device.h"
-//#include "nvc_mat.h"
-//#include "nvc_timer.h"
-//#if CUDART_VERSION >= 4000
-//#include "nvc_kernel.h"
-//#endif
-//#include "nvc_texture.h"
 #include "geryon.h"
 #include <cassert>
 #include <sstream>
