@@ -61,10 +61,12 @@ nvd_test_dep  = ucl_test_kernel.ptx ucl_test_kernel_d.ptx
 ocl_test      = ocl_test.o
 ocl_test_dep  = ucl_test_kernel.cu
 
+ocl_compiler = ocl_compiler.o
+
 # Define your executables here
 NVC_EXE = nvc_get_devices nvc_example  
 NVD_EXE = nvd_get_devices nvd_example 
-OCL_EXE = ocl_get_devices ocl_example 
+OCL_EXE = ocl_get_devices ocl_example ocl_compiler 
 TST_EXE = ucl_test nvd_test nvc_test ocl_test
 
 # Generate binary targets

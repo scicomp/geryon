@@ -94,7 +94,7 @@ class UCL_Kernel {
   inline void clear() { }
 
   /// Set the name of the kernel to be used
-  /** \ret UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/
+  /** \return UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/
   inline int set_function(UCL_Program &program, const char *function) {
     _kernel=function;
     _cq=program._cq;

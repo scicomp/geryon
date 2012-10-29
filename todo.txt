@@ -1,3 +1,8 @@
 * Add allocation routines to reserve more memory than elements
 * Add copy constructor routines
 * Texture stuff
+
+* Make the homepage at github:
+- https://github.com/scicomp/Geryon/zipball/master
+- https://github.com/scicomp/Geryon/tarball/master
+- https://github.com/scicomp/Geryon

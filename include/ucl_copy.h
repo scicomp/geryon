@@ -433,7 +433,11 @@ template <> struct _ucl_cast_copy<0,0> {
   * \param cast_buffer Buffer on host with enough storage for casting
   * - If the data types for the two matrices are same, no cast performed
   * - Padding for 2D matrices is not considered in this routine. 
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param cq The command queue
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t numel,
                           mat3 &cast_buffer, command_queue &cq) {
@@ -455,7 +459,10 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t numel,
   * \param cast_buffer Buffer on host with enough storage for casting
   * - If the data types for the two matrices are same, no cast performed
   * - Padding for 2D matrices is not considered in this routine. 
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t numel,
                           mat3 &cast_buffer, const bool async) {
@@ -483,7 +490,11 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t numel,
   *   more efficient to create a permanent casting buffer that can
   *   be passed to an alternative  copy routine.
   * - Padding for 2D matrices is not considered in this routine. 
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param cq The command queue
+  **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
                      command_queue &cq) {
@@ -522,7 +533,10 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
   *   be passed to an alternative  copy routine.
   * - Padding for 2D matrices is not considered in this routine. 
   * - The default stream is used for asynchronous copy
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
                      const bool async) {
@@ -565,7 +579,12 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t numel,
   * - If the data types for the two matrices are same, no cast performed
   * - Padding for 2D matrices is not considered in this routine. 
   * - Copy from vector to matrix and vice versa allowed
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param rows The number of rows to copy
+  * \param cols The number of columns to copy
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t rows,
                           const size_t cols, mat3 &cast_buffer,
@@ -588,7 +607,13 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t rows,
   * - If the data types for the two matrices are same, no cast performed
   * - Padding for 2D matrices is not considered in this routine. 
   * - Copy from vector to matrix and vice versa allowed
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param rows The number of rows to copy
+  * \param cq The command queue
+  * \param cols The number of columns to copy
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src, const size_t rows,
                           const size_t cols, mat3 &cast_buffer, 
@@ -674,7 +699,12 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t rows,
   * - The copy should handle padding for 2D alignment correctly
   * - Copy from vector to matrix and vice versa allowed
   * - The default stream is used for asynchronous copy
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param rows The number of rows to copy
+  * \param cols The number of columns to copy
+  **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t rows,
                      const size_t cols, const bool async) {
@@ -734,7 +764,10 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, const size_t rows,
   * - The number of bytes copied is determined by entire src data
   * - Padding for 2D matrices is not considered in this routine. 
   * - Copy from vector to matrix and vice versa allowed
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src,
                           mat3 &cast_buffer, const bool async) {
@@ -754,7 +787,11 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src,
   * - The number of bytes copied is determined by entire src data
   * - Padding for 2D matrices is not considered in this routine. 
   * - Copy from vector to matrix and vice versa allowed
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param cq The command queue
+  **/
 template <class mat1, class mat2, class mat3>
 inline void ucl_cast_copy(mat1 &dst, const mat2 &src,
                           mat3 &cast_buffer, command_queue &cq) {
@@ -778,7 +815,11 @@ inline void ucl_cast_copy(mat1 &dst, const mat2 &src,
   *   be passed to an alternative copy routine.
   * - The copy should handle padding for 2D alignment correctly
   * - Copy from vector to matrix and vice versa allowed
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  * \param cq The command queue
+  **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, command_queue &cq) {
   if (dst.row_bytes()==src.row_bytes() &&
@@ -805,7 +846,10 @@ inline void ucl_copy(mat1 &dst, const mat2 &src, command_queue &cq) {
   * - The copy should handle padding for 2D alignment correctly
   * - Copy from vector to matrix and vice versa allowed
   * - The default stream is used for asynchronous copy
-  * - Currently does not handle textures **/
+  * - Currently does not handle textures 
+  * \param dst The destination buffer
+  * \param src The source buffer
+  **/
 template <class mat1, class mat2>
 inline void ucl_copy(mat1 &dst, const mat2 &src, const bool async) {
   if (async)

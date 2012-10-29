@@ -53,6 +53,7 @@ class UCL_Program {
   /// Initialize the program with a device
   inline void init(UCL_Device &device) {
     clear();
+    _program=NULL;
     _device=device.cl_device();
     _context=device.context();
     _cq=device.cq();
@@ -65,7 +66,10 @@ class UCL_Program {
   /** \note Must call init() after each clear **/
   inline void clear() {
     if (_init_done) {
-      CL_DESTRUCT_CALL(clReleaseProgram(_program)); 
+      if(_program != NULL)
+      {
+         CL_DESTRUCT_CALL(clReleaseProgram(_program)); 
+      }
       CL_DESTRUCT_CALL(clReleaseContext(_context));
       CL_DESTRUCT_CALL(clReleaseCommandQueue(_cq));
       _init_done=false;
@@ -128,11 +132,11 @@ class UCL_Program {
                   << build_status << ") ...\n"
                   << "----------------------------------------------------------\n";
         std::cerr << build_log << std::endl;
-        #endif
+        #endif 
         return UCL_COMPILE_ERROR;
       }
     }
-    
+ 
     return UCL_SUCCESS;
   }                                               
    

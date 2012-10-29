@@ -4,32 +4,19 @@
   Vector add example (Host Code)
  
  ***************************************************************************/
-  
+
+#include "geryon.h"
+ 
 #ifdef UCL_CUDADR
-#include "nvd_device.h"
-#include "nvd_timer.h"
-#include "nvd_mat.h"
-#include "nvd_kernel.h"
 #include "example_kernel_bin.h"
-using namespace ucl_cudadr;
 #endif
 
 #ifdef UCL_OPENCL
-#include "ocl_device.h"
-#include "ocl_mat.h"
-#include "ocl_timer.h"
-#include "ocl_kernel.h"
 #include "example_kernel_str.h"
-using namespace ucl_opencl;
 #endif
 
 #ifdef UCL_CUDART
-#include "nvc_device.h"
-#include "nvc_mat.h"
-#include "nvc_timer.h"
-#include "nvc_kernel.h"
 #define kernel_string NULL
-using namespace ucl_cudart;
 #endif
 
 int main() { 

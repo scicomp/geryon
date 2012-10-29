@@ -173,7 +173,7 @@ class UCL_Kernel {
   inline void clear() { }
 
   /// Get the kernel function from a program
-  /** \ret UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/
+  /** \return UCL_ERROR_FLAG (UCL_SUCCESS, UCL_FILE_NOT_FOUND, UCL_ERROR) **/
   inline int set_function(UCL_Program &program, const char *function) {
     CUresult err=cuModuleGetFunction(&_kernel,program._module,function);
     if (err!=CUDA_SUCCESS) {
