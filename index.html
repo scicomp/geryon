@@ -43,6 +43,18 @@
 
 <p><a href="http://scicomp.github.com/geryon/api">http://scicomp.github.com/geryon/api</a></p>
 
+<h3>Use the compiler</h3>
+
+Geryon has a toolbox that includes a command line compiler for OpenCL kernels. 
+This is useful if you want to test the successful compilation of a kernel.
+You will find the compiler "oclcc" after building the tools using the 
+standard make system. Yhe compiler can be invoked using:
+<p>
+oclcc -t <targetid> -k <filename> -f <flags> 
+For the test example just use:<br>
+oclcc -t 0 -k ucl_test_kernel.cu -f "-DOrdinal=int -DScalar=float"
+</p>
+
 <h3>Copyright</h3>
 
 <p>Copyright (2010) Sandia Corporation. Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain rights in this software. This software is distributed under the Simplified BSD License.</p>
