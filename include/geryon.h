@@ -112,6 +112,7 @@ using namespace ucl_cudart;
 #include "ucl_types.h" 
 #include "ucl_vector.h"
 #include "ucl_version.h"
+#include "ucl_tracer.h"
 
 /** 
  * \brief Converts to human readable error. 

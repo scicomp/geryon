@@ -44,6 +44,16 @@ nvd_example_dep = example_kernel_bin.h
 ocl_example = ocl_example.o  
 ocl_example_dep = example_kernel_str.h  
 
+# Example: use_timer
+nvc_use_timer = nvc_use_timer.o
+nvd_use_timer = nvd_use_timer.o
+ocl_use_timer = ocl_use_timer.o
+
+# Example: use_timer
+nvc_use_tracer = nvc_use_tracer.o
+nvd_use_tracer = nvd_use_tracer.o
+ocl_use_tracer = ocl_use_tracer.o
+
 # Example: get_devices
 nvc_get_devices = nvc_get_devices.o
 nvd_get_devices = nvd_get_devices.o
@@ -61,13 +71,14 @@ nvd_test_dep  = ucl_test_kernel.ptx ucl_test_kernel_d.ptx
 ocl_test      = ocl_test.o
 ocl_test_dep  = ucl_test_kernel.cu
 
+# Compiler target
 oclcc = oclcc.o
 
 # Define your executables here
-NVC_EXE = nvc_get_devices nvc_example  
-NVD_EXE = nvd_get_devices nvd_example 
-OCL_EXE = ocl_get_devices ocl_example oclcc 
-TST_EXE = ucl_test nvd_test nvc_test ocl_test
+NVC_EXE = nvc_get_devices nvc_example nvc_use_timer nvc_use_tracer 
+NVD_EXE = nvd_get_devices nvd_example nvd_use_timer nvd_use_tracer
+OCL_EXE = ocl_get_devices ocl_example ocl_use_timer ocl_use_tracer oclcc 
+TST_EXE = ucl_test nvd_test nvc_test ocl_test 
 
 # Generate binary targets
 NVC_BIN = $(addprefix $(BIN_DIR)/,$(NVC_EXE))
